@@ -2,336 +2,194 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FC Manager · Prototipo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>FC Manager · Landscape</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
   * { -webkit-tap-highlight-color: transparent; }
-  html, body { background:#0f1015; }
+  html, body { background:#0b0c10; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-  ::-webkit-scrollbar { width: 0; height: 0; }
-  .card { background:#181a20; border-radius:16px; }
-  .card-sm { background:#181a20; border-radius:12px; }
-  .fade-in { animation: fadeIn .25s ease-out; }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-thumb { background: #2a2e38; border-radius: 4px; }
+  .no-scrollbar::-webkit-scrollbar { display:none; }
+  .card { background:#1f2833; border-radius:16px; }
+  .card-sm { background:#242a35; border-radius:12px; }
+  .fade-in { animation: fadeIn .2s ease-out; }
   @keyframes fadeIn { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
-  .statbar-fill { transition: width .4s ease; }
-  #matchLog::-webkit-scrollbar{ display:none; }
-  .kit-shirt { filter: drop-shadow(0 4px 8px rgba(0,0,0,.4)); }
+  .side-link { color:#8a93a3; }
+  .side-link.active { background:#10b981; color:#04150f; }
+  .side-link:not(.active):hover { background:#1f2833; color:#fff; }
+  .tab-pill { background:#242a35; color:#9ca3af; }
+  .tab-pill.active { background:#10b981; color:#04150f; }
   .pulse-live { animation: pulseLive 1.4s infinite; }
   @keyframes pulseLive { 0%,100%{opacity:1;} 50%{opacity:.35;} }
-  .no-scrollbar::-webkit-scrollbar { display:none; }
-  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
-  .tab-btn { background:#181a20; color:#9ca3af; }
-  .tab-btn.active { background:#22c55e; color:#000; }
+  #rotateWarning { display:none; }
+  @media (max-aspect-ratio: 1/1) {
+    #rotateWarning { display:flex; }
+    #appShell { display:none !important; }
+  }
+  .pitch-token { transition: left .3s ease, top .3s ease; }
 </style>
 </head>
-<body class="bg-[#0f1015] text-white min-h-screen">
+<body class="bg-[#0b0c10] text-white">
 
-  <!-- ============ SCREEN: MAIN MENU ============ -->
-  <div id="screen-menu" class="max-w-md mx-auto min-h-screen flex flex-col items-center justify-center px-6 text-center gap-10 fade-in">
-    <div>
-      <div class="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-2xl mb-5">
-        <i class="fa-solid fa-futbol text-4xl"></i>
-      </div>
-      <h1 class="text-3xl font-extrabold tracking-tight">FC MANAGER</h1>
-      <p class="text-sm text-gray-500 mt-1">Simulador de mánager de fútbol</p>
-    </div>
-    <div class="w-full space-y-3">
-      <button onclick="openNewGame()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm transition active:scale-[0.98]">
-        <i class="fa-solid fa-plus"></i> Nueva Partida
-      </button>
-      <button onclick="openLoad()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm transition active:scale-[0.98]">
-        <i class="fa-solid fa-folder-open"></i> Cargar Partida
-      </button>
-    </div>
-    <p class="text-[10px] text-gray-600">Prototipo · Temporada 2025/26</p>
-  </div>
+<div id="rotateWarning" class="fixed inset-0 z-[100] bg-[#0b0c10] flex-col items-center justify-center text-center px-8 gap-4">
+  <i class="fa-solid fa-mobile-screen-button text-5xl text-emerald-400"></i>
+  <p class="font-bold text-lg">Gira tu dispositivo</p>
+  <p class="text-sm text-gray-400 max-w-xs">Este simulador está diseñado para pantallas horizontales (landscape).</p>
+</div>
 
-  <!-- ============ SCREEN: NUEVA PARTIDA ============ -->
-  <div id="screen-newgame" class="hidden max-w-md mx-auto min-h-screen px-4 pb-8 fade-in">
-    <header class="sticky top-0 bg-[#0f1015]/95 backdrop-blur py-4 flex items-center gap-3 border-b border-white/5 -mx-4 px-4 mb-4 z-10">
-      <button onclick="newGameBack()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="fa-solid fa-arrow-left text-xs"></i></button>
-      <div class="min-w-0">
-        <p id="newGameStepLabel" class="text-[10px] text-gray-500 font-bold uppercase">Paso 1 de 3</p>
-        <h2 id="newGameTitle" class="font-bold text-base truncate">Elige un país</h2>
+<div id="appShell" class="w-full">
+
+  <!-- ============================================================
+       PANTALLA: SELECCIÓN DE CLUB
+       ============================================================ -->
+  <div id="screen-select" class="w-full h-screen flex flex-col">
+    <header class="px-8 py-4 border-b border-white/5 flex items-center gap-3 shrink-0">
+      <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0"><i class="fa-solid fa-futbol text-black"></i></div>
+      <div>
+        <h1 class="font-extrabold text-lg leading-tight">FC MANAGER</h1>
+        <p class="text-[11px] text-gray-500">Elige liga y club para comenzar tu carrera</p>
       </div>
     </header>
-    <div id="newGameList" class="space-y-2"></div>
+    <div class="flex-1 flex min-h-0">
+      <div class="w-52 border-r border-white/5 p-3 space-y-1 overflow-y-auto shrink-0" id="selectCountryRail"></div>
+      <div class="flex-1 p-5 overflow-y-auto" id="selectClubList"></div>
+      <div class="w-80 border-l border-white/5 p-5 shrink-0 overflow-y-auto" id="selectClubDetail">
+        <div class="h-full flex flex-col items-center justify-center text-center text-gray-600 gap-2">
+          <i class="fa-solid fa-shield-halved text-3xl"></i>
+          <p class="text-xs">Selecciona un club para ver sus detalles</p>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- ============ SCREEN: CARGAR PARTIDA ============ -->
-  <div id="screen-load" class="hidden max-w-md mx-auto min-h-screen px-4 pb-8 fade-in">
-    <header class="sticky top-0 bg-[#0f1015]/95 backdrop-blur py-4 flex items-center gap-3 border-b border-white/5 -mx-4 px-4 mb-4 z-10">
-      <button onclick="showScreen('menu')" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="fa-solid fa-arrow-left text-xs"></i></button>
-      <h2 class="font-bold text-base">Cargar Partida</h2>
-    </header>
-    <div id="loadSlots" class="space-y-3"></div>
-  </div>
+  <!-- ============================================================
+       PANTALLA: JUEGO (dashboard, plantilla, tácticas, calendario, traspasos)
+       ============================================================ -->
+  <div id="screen-game" class="hidden w-full h-screen flex">
 
-<div id="app" class="hidden max-w-md mx-auto min-h-screen relative">
+    <!-- SIDEBAR -->
+    <aside class="w-16 lg:w-56 bg-[#12141a] border-r border-white/5 flex flex-col shrink-0">
+      <div class="p-3 lg:p-4 flex items-center gap-2.5 border-b border-white/5">
+        <div id="sidebarCrest" class="w-9 h-9 rounded-lg flex items-center justify-center font-black text-[10px] shrink-0">FCB</div>
+        <div class="hidden lg:block min-w-0">
+          <p id="sidebarClubName" class="font-bold text-xs truncate">—</p>
+          <p id="sidebarLeague" class="text-[10px] text-gray-500 truncate">—</p>
+        </div>
+      </div>
+      <nav class="flex-1 py-3 px-2 space-y-1" id="sidebarNav"></nav>
+      <button onclick="confirmExit()" class="m-2 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-bold flex items-center justify-center gap-2 text-red-400">
+        <i class="fa-solid fa-right-from-bracket"></i><span class="hidden lg:inline">Salir</span>
+      </button>
+    </aside>
 
-  <!-- CABECERA PRINCIPAL DEL CLUB -->
-  <header class="sticky top-0 z-30 bg-[#0f1015]/95 backdrop-blur border-b border-white/5">
-    <div class="flex items-center justify-between px-4 pt-3">
-      <div class="flex items-center gap-3 min-w-0">
-        <div id="topClubCrest" class="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black shadow-lg shrink-0">FCB</div>
+    <div class="flex-1 flex flex-col min-w-0">
+      <!-- TOP HEADER -->
+      <header class="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-5 lg:px-7 bg-[#0b0c10]/80">
         <div class="min-w-0">
-          <p id="topClubName" class="font-extrabold text-base leading-tight truncate">FC Barcelona</p>
-          <p id="topClubLeague" class="text-[10px] text-gray-500 leading-tight truncate">La Liga EA Sports · España</p>
+          <p id="viewTitle" class="font-extrabold text-base lg:text-lg leading-tight">Dashboard</p>
+          <p id="gameDate" class="text-[11px] text-gray-500 leading-tight">—</p>
         </div>
-      </div>
-      <div class="flex items-center gap-2 shrink-0">
-        <div class="text-center">
-          <div id="clubRatingBadge" class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black">85</div>
-        </div>
-        <div class="relative">
-          <button id="topMenuBtn" onclick="toggleTopMenu()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-300">
-            <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+        <div class="flex items-center gap-3 lg:gap-5 shrink-0">
+          <div class="hidden sm:flex items-center gap-1.5 text-sm font-bold text-amber-400"><i class="fa-solid fa-coins"></i><span id="hdrCoins">—</span></div>
+          <div class="flex items-center gap-1.5 text-sm font-bold text-emerald-400"><i class="fa-solid fa-sack-dollar"></i><span id="hdrMoney">—</span></div>
+          <button id="continueBtn" onclick="advanceToNextMatch()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs lg:text-sm px-4 lg:px-5 py-2.5 rounded-xl flex items-center gap-2 transition active:scale-95">
+            <i class="fa-solid fa-forward"></i> <span class="hidden sm:inline">Continuar</span>
           </button>
-          <div id="topMenuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-[#1c1e26] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
-            <button onclick="saveGame()" class="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-white/5 flex items-center gap-2"><i class="fa-solid fa-floppy-disk text-emerald-400"></i> Guardar partida</button>
-            <button onclick="exitToMenu()" class="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-white/5 flex items-center gap-2 text-red-400"><i class="fa-solid fa-right-from-bracket"></i> Salir al menú</button>
-          </div>
         </div>
-      </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto p-5 lg:p-6">
+        <!-- DASHBOARD -->
+        <section id="view-dashboard" class="hidden fade-in grid grid-cols-3 gap-5 auto-rows-min">
+          <div class="col-span-3 lg:col-span-2 card p-5" id="widgetNextMatch"></div>
+          <div class="col-span-3 lg:col-span-1 lg:row-span-2 card p-5 flex flex-col min-h-[280px]" id="widgetNews"></div>
+          <div class="col-span-3 lg:col-span-1 card p-5" id="widgetStandings"></div>
+          <div class="col-span-3 lg:col-span-1 card p-5" id="widgetSpotlight"></div>
+        </section>
+
+        <!-- PLANTILLA -->
+        <section id="view-squad" class="hidden fade-in space-y-4">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <div class="flex gap-1.5" id="squadTabs"></div>
+            <div class="flex gap-4 text-center text-xs">
+              <div><p class="text-gray-500">Edad media</p><p class="font-bold text-emerald-400" id="squadAvgAge">—</p></div>
+              <div><p class="text-gray-500">Media OVR</p><p class="font-bold text-emerald-400" id="squadAvgOvr">—</p></div>
+            </div>
+          </div>
+          <div class="card p-2 overflow-x-auto">
+            <table class="w-full text-xs min-w-[760px]" id="squadTable"></table>
+          </div>
+        </section>
+
+        <!-- TÁCTICAS -->
+        <section id="view-tactics" class="hidden fade-in grid grid-cols-3 gap-5" style="min-height:500px">
+          <div class="col-span-3 lg:col-span-2 card p-4 flex flex-col">
+            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+              <p class="font-bold text-sm">Alineación titular</p>
+              <div class="flex gap-1.5" id="formationTabs"></div>
+            </div>
+            <div id="pitchViewH" class="relative flex-1 rounded-xl bg-gradient-to-r from-emerald-900/40 to-emerald-950/60 border border-emerald-500/20 overflow-hidden min-h-[380px]"></div>
+            <p class="text-[10px] text-gray-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i>Selecciona un suplente y luego pulsa sobre una posición del campo para hacer el cambio.</p>
+          </div>
+          <div class="col-span-3 lg:col-span-1 card p-4 flex flex-col min-h-0">
+            <div class="flex gap-1.5 mb-3" id="tacticsSubTabs"></div>
+            <div class="flex-1 overflow-y-auto pr-1" id="tacticsSidePanel"></div>
+          </div>
+        </section>
+
+        <!-- CALENDARIO -->
+        <section id="view-calendar" class="hidden fade-in grid grid-cols-3 gap-5">
+          <div class="col-span-3 lg:col-span-2 space-y-2">
+            <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Calendario de la temporada</p>
+            <div id="fixtureList" class="space-y-2"></div>
+          </div>
+          <div class="col-span-3 lg:col-span-1 card p-4">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Clasificación</p>
+              <span id="roundLabel" class="text-[10px] text-gray-500 font-bold"></span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-[11px]" id="standingsTable"></table>
+            </div>
+          </div>
+        </section>
+
+        <!-- TRASPASOS Y FINANZAS -->
+        <section id="view-transfers" class="hidden fade-in space-y-5">
+          <div class="grid grid-cols-3 gap-4">
+            <div class="card p-4">
+              <p class="text-[10px] text-gray-500 uppercase font-bold">Presupuesto</p>
+              <p id="txMoney" class="font-black text-emerald-400 text-lg mt-0.5">—</p>
+            </div>
+            <div class="card p-4">
+              <p class="text-[10px] text-gray-500 uppercase font-bold">Masa salarial / sem.</p>
+              <p id="txWageBill" class="font-black text-sm mt-0.5">—</p>
+            </div>
+            <div class="card p-4">
+              <p class="text-[10px] text-gray-500 uppercase font-bold">Ingresos por jornada</p>
+              <p id="txIncome" class="font-black text-sm mt-0.5">—</p>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between px-1">
+              <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Mercado de fichajes</p>
+              <button onclick="refreshMarket()" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg font-semibold flex items-center gap-1.5">
+                <i class="fa-solid fa-rotate"></i> Actualizar
+              </button>
+            </div>
+            <div id="marketList" class="grid grid-cols-1 lg:grid-cols-2 gap-2.5"></div>
+          </div>
+        </section>
+      </main>
     </div>
-    <div class="flex items-center gap-3 px-4 pt-2 pb-2 text-[11px] font-semibold">
-      <div class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-sack-dollar"></i><span id="topMoney">—</span></div>
-      <div class="flex items-center gap-1 text-pink-400"><i class="fa-solid fa-heart"></i><span id="topMorale">—</span></div>
-    </div>
-    <!-- PESTAÑAS CON SCROLL HORIZONTAL -->
-    <nav class="flex gap-1.5 px-3 pb-2.5 overflow-x-auto no-scrollbar">
-      <button class="tab-btn active shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="club" onclick="switchView('club')">
-        <i class="fa-solid fa-shield-halved"></i> Club
-      </button>
-      <button class="tab-btn shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="squad" onclick="switchView('squad')">
-        <i class="fa-solid fa-people-group"></i> Plantilla
-      </button>
-      <button class="tab-btn shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="tactics" onclick="switchView('tactics')">
-        <i class="fa-solid fa-chess-board"></i> Tácticas
-      </button>
-      <button class="tab-btn shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="calendar" onclick="switchView('calendar')">
-        <i class="fa-solid fa-calendar-days"></i> Calendario
-      </button>
-      <button class="tab-btn shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="office" onclick="switchView('office')">
-        <i class="fa-solid fa-briefcase"></i> Oficina
-      </button>
-    </nav>
-  </header>
+  </div>
 
-  <main class="px-4 pt-4 pb-8 space-y-4">
-
-    <!-- ============ VIEW: CLUB ============ -->
-    <section id="view-club" class="fade-in space-y-4">
-      <div class="grid grid-cols-4 gap-2 text-center">
-        <div class="card-sm py-2.5">
-          <p class="text-[10px] text-gray-500">Edad media</p>
-          <p id="statAvgAge" class="font-bold text-sm mt-0.5">—</p>
-        </div>
-        <div class="card-sm py-2.5">
-          <p class="text-[10px] text-gray-500">Nación</p>
-          <p id="statNation" class="font-bold text-sm mt-0.5">🇪🇸 ESP</p>
-        </div>
-        <div class="card-sm py-2.5">
-          <p class="text-[10px] text-gray-500">Valor</p>
-          <p id="statValue" class="font-bold text-sm mt-0.5">685M€</p>
-        </div>
-        <div class="card-sm py-2.5">
-          <p class="text-[10px] text-gray-500">Rival</p>
-          <p id="statRival" class="font-bold text-sm mt-0.5">R. Madrid</p>
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Plantilla destacada</p>
-        <div class="grid grid-cols-3 gap-2" id="squadHighlights"></div>
-      </div>
-
-      <div class="space-y-2">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Equipaciones</p>
-        <div class="grid grid-cols-3 gap-2">
-          <div class="card-sm p-3 flex flex-col items-center gap-2">
-            <div id="kitHome" class="w-full h-16 rounded-lg flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-white/90"></i></div>
-            <p class="text-[10px] text-gray-400 font-semibold">1ª Local</p>
-          </div>
-          <div class="card-sm p-3 flex flex-col items-center gap-2">
-            <div id="kitAway" class="w-full h-16 rounded-lg flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-black/70"></i></div>
-            <p class="text-[10px] text-gray-400 font-semibold">2ª Visitante</p>
-          </div>
-          <div class="card-sm p-3 flex flex-col items-center gap-2">
-            <div id="kitGk" class="w-full h-16 rounded-lg flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-black/70"></i></div>
-            <p class="text-[10px] text-gray-400 font-semibold">Portero</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Estadísticas de equipo</p>
-        <div class="card p-4 grid grid-cols-4 gap-2 text-center" id="teamStatsBlock"></div>
-      </div>
-
-      <div class="space-y-2 pb-2">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Estadio</p>
-        <div class="card p-4 flex items-center gap-4">
-          <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center shrink-0">
-            <i class="fa-solid fa-futbol text-2xl text-emerald-400"></i>
-          </div>
-          <div class="flex-1">
-            <p id="stadiumName" class="font-bold text-sm">Spotify Camp Nou</p>
-            <p id="stadiumCapacity" class="text-xs text-gray-500">Capacidad · 99.354 espectadores</p>
-          </div>
-          <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
-        </div>
-      </div>
-
-      <div class="space-y-2 pb-2">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Historia del club</p>
-        <div class="card p-4" id="clubHistoryBlock"></div>
-      </div>
-    </section>
-
-    <!-- ============ VIEW: SQUAD ============ -->
-    <section id="view-squad" class="hidden fade-in space-y-4">
-      <div class="card p-4 flex items-center justify-between">
-        <div>
-          <p class="text-[10px] text-gray-500 uppercase font-bold">Plantilla</p>
-          <p class="font-bold text-sm" id="squadCount">— jugadores</p>
-        </div>
-        <div class="flex gap-4 text-center">
-          <div>
-            <p class="text-[10px] text-gray-500">Edad media</p>
-            <p class="font-bold text-emerald-400" id="squadAvgAge">—</p>
-          </div>
-          <div>
-            <p class="text-[10px] text-gray-500">Media OVR</p>
-            <p class="font-bold text-emerald-400" id="squadAvgOvr">—</p>
-          </div>
-        </div>
-      </div>
-      <div id="squadGrid" class="flex flex-col gap-2.5"></div>
-    </section>
-
-    <!-- ============ VIEW: TÁCTICAS ============ -->
-    <section id="view-tactics" class="hidden fade-in space-y-4">
-      <div class="card p-4">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Formación</p>
-        <div class="grid grid-cols-4 gap-2" id="formationButtons"></div>
-      </div>
-
-      <div class="card p-4">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Once inicial</p>
-        <div id="pitchView" class="relative w-full aspect-[3/4] rounded-xl bg-gradient-to-b from-emerald-800/40 to-emerald-950/60 border border-emerald-500/20 overflow-hidden"></div>
-      </div>
-
-      <div class="card p-4">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Mentalidad</p>
-        <div class="grid grid-cols-3 gap-2" id="mentalityButtons"></div>
-      </div>
-
-      <div class="card p-4 space-y-3 pb-2">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Lanzadores</p>
-        <div class="space-y-1.5">
-          <label class="text-[10px] text-gray-500 font-bold uppercase">Penaltis</label>
-          <select id="penaltyTakerSelect" onchange="state.tactics.penalty=this.value" class="w-full bg-[#0f1015] border border-white/10 rounded-lg px-3 py-2.5 text-sm"></select>
-        </div>
-        <div class="space-y-1.5">
-          <label class="text-[10px] text-gray-500 font-bold uppercase">Faltas</label>
-          <select id="freekickTakerSelect" onchange="state.tactics.freekick=this.value" class="w-full bg-[#0f1015] border border-white/10 rounded-lg px-3 py-2.5 text-sm"></select>
-        </div>
-      </div>
-    </section>
-
-    <!-- ============ VIEW: CALENDARIO / PARTIDOS ============ -->
-    <section id="view-calendar" class="hidden fade-in space-y-4">
-      <div class="card p-5">
-        <div class="flex items-center justify-between mb-1">
-          <span id="matchStatusLabel" class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Listo para jugar</span>
-          <span id="matchMinute" class="text-[10px] font-bold text-emerald-400 hidden"><i class="fa-solid fa-circle text-[6px] mr-1 pulse-live"></i><span id="minuteNum">0</span>'</span>
-        </div>
-        <div class="flex items-center justify-between mt-2">
-          <div class="flex-1 text-center">
-            <div id="teamCrestSmall" class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black">FCB</div>
-            <p id="teamNameSmall" class="text-xs font-bold mt-1">Barcelona</p>
-          </div>
-          <div class="flex items-center gap-2 px-3">
-            <span id="scoreHome" class="text-3xl font-black">0</span>
-            <span class="text-lg text-gray-500">-</span>
-            <span id="scoreAway" class="text-3xl font-black">0</span>
-          </div>
-          <div class="flex-1 text-center">
-            <div id="rivalCrest" class="w-12 h-12 mx-auto rounded-xl bg-slate-700 flex items-center justify-center text-[10px] font-black">RIV</div>
-            <p id="rivalName" class="text-xs font-bold mt-1">Rival</p>
-          </div>
-        </div>
-        <button id="playBtn" onclick="startMatch()" class="mt-5 w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-play"></i> Jugar Siguiente Partido
-        </button>
-      </div>
-
-      <div class="card p-4">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Comentarios en vivo</p>
-        <div id="matchLog" class="space-y-1.5 h-48 overflow-y-auto text-xs text-gray-300 pr-1">
-          <p class="text-gray-600 italic">Pulsa "Jugar Siguiente Partido" para simular el encuentro…</p>
-        </div>
-      </div>
-
-      <div class="card p-4">
-        <div class="flex items-center justify-between mb-2">
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Clasificación</p>
-          <span id="roundLabel" class="text-[10px] text-gray-500 font-bold"></span>
-        </div>
-        <div class="overflow-x-auto">
-          <table class="w-full text-[11px]" id="standingsTable"></table>
-        </div>
-      </div>
-
-      <div class="space-y-2 pb-2">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Calendario de la temporada</p>
-        <div id="fixtureList" class="space-y-2"></div>
-      </div>
-    </section>
-
-    <!-- ============ VIEW: OFICINA / MERCADO ============ -->
-    <section id="view-office" class="hidden fade-in space-y-4">
-      <div class="card p-4 grid grid-cols-2 gap-3">
-        <div>
-          <p class="text-[10px] text-gray-500 uppercase font-bold">Presupuesto</p>
-          <p id="officeMoney" class="font-black text-emerald-400 text-lg mt-0.5">—</p>
-        </div>
-        <div>
-          <p class="text-[10px] text-gray-500 uppercase font-bold">Masa salarial / semana</p>
-          <p id="officeWageBill" class="font-black text-sm mt-0.5">—</p>
-        </div>
-      </div>
-
-      <div class="card p-4 space-y-3">
-        <div class="flex items-center justify-between gap-2">
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Ojeadores</p>
-          <button onclick="scoutPlayer()" class="text-[11px] bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 shrink-0">
-            <i class="fa-solid fa-binoculars"></i> Enviar (500k€)
-          </button>
-        </div>
-        <div id="scoutList" class="space-y-2"></div>
-      </div>
-
-      <div class="space-y-2 pb-2">
-        <div class="flex items-center justify-between px-1">
-          <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Mercado de fichajes</p>
-          <button onclick="refreshMarket()" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg font-semibold flex items-center gap-1.5">
-            <i class="fa-solid fa-rotate"></i> Actualizar
-          </button>
-        </div>
-        <div id="marketList" class="space-y-2.5"></div>
-      </div>
-    </section>
-
-  </main>
-
-  <!-- PLAYER MODAL -->
-  <div id="playerModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center">
-    <div class="max-w-md w-full bg-[#15161c] rounded-t-3xl p-5 space-y-5 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
-
+  <!-- MODAL: PERFIL DE JUGADOR -->
+  <div id="playerModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-4">
+    <div class="max-w-sm w-full bg-[#171b22] rounded-3xl p-5 space-y-5 max-h-[88vh] overflow-y-auto" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
@@ -343,61 +201,57 @@
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-
       <div class="flex items-start gap-4">
-        <div class="w-28 h-28 rounded-2xl bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center shrink-0">
-          <i class="fa-solid fa-user text-5xl text-slate-500"></i>
+        <div class="w-24 h-24 rounded-2xl bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-user text-4xl text-slate-500"></i>
         </div>
         <div class="flex-1 pt-1 min-w-0">
-          <p id="modalName" class="font-extrabold text-xl leading-tight truncate"></p>
-          <p class="text-sm text-gray-400 font-semibold mt-1">
+          <p id="modalName" class="font-extrabold text-lg leading-tight truncate"></p>
+          <p class="text-xs text-gray-400 font-semibold mt-1">
             <span id="modalAge"></span>a. <span class="text-gray-600">|</span>
-            <span id="modalPrimaryPos" class="text-white"></span>
-            <span id="modalOtherPos" class="text-gray-500"></span>
+            <span id="modalPrimaryPos" class="text-white"></span> <span id="modalOtherPos" class="text-gray-500"></span>
           </p>
-          <div class="flex gap-6 mt-4">
-            <div>
-              <p class="text-[11px] text-gray-500 font-semibold">General</p>
-              <p id="modalOvr" class="text-3xl font-black mt-0.5"></p>
-            </div>
-            <div>
-              <p class="text-[11px] text-gray-500 font-semibold">Potencial</p>
-              <p id="modalPotential" class="text-3xl font-black mt-0.5 text-gray-600"></p>
-            </div>
+          <div class="flex gap-6 mt-3">
+            <div><p class="text-[10px] text-gray-500 font-semibold">General</p><p id="modalOvr" class="text-2xl font-black mt-0.5"></p></div>
+            <div><p class="text-[10px] text-gray-500 font-semibold">Salud</p><p id="modalHealth" class="text-2xl font-black mt-0.5"></p></div>
+            <div><p class="text-[10px] text-gray-500 font-semibold">Moral</p><p id="modalMorale" class="text-2xl mt-0.5"></p></div>
           </div>
         </div>
       </div>
-
       <div class="border-t border-white/10 pt-4 grid grid-cols-3 gap-y-4 text-center" id="modalStats"></div>
-
       <div class="border-t border-white/10 pt-4 grid grid-cols-4 gap-2 text-center">
-        <div>
-          <p class="text-[10px] text-gray-500 font-semibold">Valor</p>
-          <p id="modalValue" class="font-bold text-sm mt-1"></p>
-        </div>
-        <div>
-          <p class="text-[10px] text-gray-500 font-semibold">Salario</p>
-          <p id="modalWage" class="font-bold text-sm mt-1"></p>
-        </div>
-        <div>
-          <p class="text-[10px] text-gray-500 font-semibold">Pie Preferido</p>
-          <p id="modalFoot" class="font-bold text-sm mt-1"></p>
-        </div>
-        <div>
-          <p class="text-[10px] text-gray-500 font-semibold">Cara Real</p>
-          <p class="font-bold text-sm mt-1">No</p>
-        </div>
+        <div><p class="text-[10px] text-gray-500 font-semibold">Valor</p><p id="modalValue" class="font-bold text-sm mt-1"></p></div>
+        <div><p class="text-[10px] text-gray-500 font-semibold">Salario</p><p id="modalWage" class="font-bold text-sm mt-1"></p></div>
+        <div><p class="text-[10px] text-gray-500 font-semibold">Pie</p><p id="modalFoot" class="font-bold text-sm mt-1"></p></div>
+        <div><p class="text-[10px] text-gray-500 font-semibold">Cara Real</p><p class="font-bold text-sm mt-1">No</p></div>
       </div>
-
       <div class="border-t border-white/10 pt-4 space-y-1.5">
         <label class="text-[10px] font-bold text-gray-500 uppercase">Cambiar posición / rol</label>
-        <select id="modalPositionSelect" class="w-full bg-[#0f1015] border border-white/10 rounded-lg px-3 py-2.5 text-sm"></select>
+        <select id="modalPositionSelect" class="w-full bg-[#0b0c10] border border-white/10 rounded-lg px-3 py-2.5 text-sm"></select>
       </div>
+      <button onclick="savePlayerPosition()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2.5 rounded-xl text-sm">Guardar cambios</button>
+    </div>
+  </div>
 
-      <div class="flex gap-2 pt-1">
-        <button onclick="savePlayerPosition()" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2.5 rounded-xl text-sm">Guardar cambios</button>
-        <button onclick="sellCurrentPlayer()" class="flex-1 bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold py-2.5 rounded-xl text-sm border border-red-500/30">Vender jugador</button>
+  <!-- MODAL: RESULTADO DE PARTIDO -->
+  <div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center px-4">
+    <div class="max-w-sm w-full bg-[#171b22] rounded-3xl p-6 space-y-4" onclick="event.stopPropagation()">
+      <p class="text-center text-[10px] font-bold uppercase tracking-wide text-gray-500" id="resultRound"></p>
+      <div class="flex items-center justify-center gap-4">
+        <div class="text-center flex-1">
+          <div id="resultCrestHome" class="w-14 h-14 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black"></div>
+          <p id="resultNameHome" class="text-xs font-bold mt-1.5 truncate"></p>
+        </div>
+        <div class="flex items-center gap-2 text-3xl font-black shrink-0">
+          <span id="resultGh"></span><span class="text-gray-600 text-lg">-</span><span id="resultGa"></span>
+        </div>
+        <div class="text-center flex-1">
+          <div id="resultCrestAway" class="w-14 h-14 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black bg-slate-700"></div>
+          <p id="resultNameAway" class="text-xs font-bold mt-1.5 truncate"></p>
+        </div>
       </div>
+      <div id="resultEvents" class="space-y-1.5 max-h-40 overflow-y-auto text-xs text-gray-300 border-t border-white/10 pt-3"></div>
+      <button onclick="closeResultModal()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2.5 rounded-xl text-sm">Continuar</button>
     </div>
   </div>
 
@@ -405,7 +259,7 @@
 
 <script>
 /* ============================================================
-   ESTADO DEL JUEGO
+   DATOS BASE: POSICIONES, JUGADOR, PAÍSES/LIGAS/CLUBES
    ============================================================ */
 const POSITION_GROUPS = {
   "Portero": ["POR"],
@@ -419,20 +273,23 @@ const POSITION_LABELS = {
   MI: "Interior izquierdo", MD: "Interior derecho",
   ED: "Extremo derecho", EI: "Extremo izquierdo", SD: "Segundo delantero", DC: "Delantero centro"
 };
+function positionZoneClass(pos) {
+  if (pos === "POR") return "bg-slate-600 text-white";
+  if (POSITION_GROUPS["Defensas"].includes(pos)) return "bg-blue-600 text-white";
+  if (POSITION_GROUPS["Centrocampistas"].includes(pos)) return "bg-emerald-600 text-white";
+  return "bg-orange-500 text-black";
+}
 
 function makePlayer(spec) {
   const posList = spec.positions;
   return {
-    id: spec.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + spec.age,
+    id: spec.name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + spec.age + "-" + Math.random().toString(36).slice(2, 7),
     name: spec.name, positions: posList, position: posList[0],
     age: spec.age, height: spec.height, weight: spec.weight, ovr: spec.ovr,
-    value: spec.value, wage: spec.wage, foot: spec.foot, nation: spec.nation,
-    stats: spec.stats
+    value: spec.value, wage: spec.wage, foot: spec.foot, nation: spec.nation, stats: spec.stats
   };
 }
 
-/* Datos reales extraídos de la ficha de jugadores de FC Barcelona (GRL, edad,
-   valor, salario, altura, peso, pie preferido, nación y stats RIT/TIR/PAS/REG/DEF/FÍS). */
 function createBarcelonaSquad() {
   return [
     makePlayer({ name: "Joan García", positions: ["POR"], ovr: 86, age: 25, height: 193, weight: 85, value: 72.5, wage: 71000, foot: "Derecho", nation: { flag: "🇪🇸", country: "España" }, stats: { ritmo: 85, tiro: 85, pase: 80, regate: 88, defensa: 46, fisico: 84 } }),
@@ -463,9 +320,6 @@ function createBarcelonaSquad() {
   ];
 }
 
-/* ============================================================
-   PAÍSES · LIGAS · EQUIPOS
-   ============================================================ */
 const COUNTRIES = {
   "España": { flag: "🇪🇸", code: "ESP", leagues: { "LaLiga EA Sports": [
     { name: "FC Barcelona", tag: "FCB", rating: 86, real: true },
@@ -515,24 +369,29 @@ const COUNTRIES = {
   ] } }
 };
 
+const MARKET_FIRST = ["Joan", "Marc", "Pau", "Aleix", "Nil", "Roc", "Guim", "Ivo", "Oriol", "Bru", "Toni", "Adrià", "Biel", "Ferran", "Dani", "Kilian", "Enric", "Martí", "Andreu", "Jofre"];
+const MARKET_LAST = ["Vidal", "Puig", "Rovira", "Camprodon", "Solà", "Bertran", "Estany", "Vinyes", "Casanova", "Ripoll", "Montseny", "Garriga", "Bellver", "Freixa", "Coma"];
+
+/* ============================================================
+   ESTADO DEL JUEGO
+   ============================================================ */
 const state = {
-  money: 42_000_000,
-  morale: 78,
-  manager: { name: "Hansi Flick", role: "Entrenador" },
   club: null,
   players: [],
+  manager: null,
+  money: 0,
+  coins: 0,
+  morale: 78,
   market: [],
-  scoutReports: [],
+  news: [],
   season: null,
-  tactics: { formation: "4-3-3", mentality: "Equilibrada", penalty: null, freekick: null, xi: [] },
+  currentDate: null,
+  tactics: { formation: "4-3-3", mentality: "Equilibrada", instructions: { style: "Posesión" }, penalty: null, freekick: null, xiIds: [], selectedBenchId: null },
+  squadTab: "primero",
+  tacticsSubTab: "suplentes",
   currentModalPlayerId: null,
-  rival: null,
-  matchTimer: null,
-  saveSlot: null
+  selectedClub: null
 };
-
-const MARKET_FIRST = ["Joan","Marc","Pau","Aleix","Nil","Roc","Guim","Ivo","Oriol","Bru","Toni","Adrià","Biel","Ferran","Dani","Kilian","Enric","Martí","Andreu","Jofre"];
-const MARKET_LAST = ["Vidal","Puig","Rovira","Camprodon","Solà","Bertran","Estany","Vinyes","Casanova","Ripoll","Montseny","Garriga","Bellver","Freixa","Coma"];
 
 /* ============================================================
    UTILIDADES
@@ -560,22 +419,15 @@ function ovrBadgeClass(ovr) {
   if (ovr >= 70) return "bg-orange-400 text-black";
   return "bg-red-500 text-white";
 }
-function avatarColor(name) {
-  const h = hashStr(name) % 360;
-  return `hsl(${h}, 55%, 42%)`;
-}
-function initials(name) {
-  return name.split(" ").map(p => p[0]).slice(0, 2).join("").toUpperCase();
-}
+function avatarColor(name) { return `hsl(${hashStr(name) % 360}, 55%, 42%)`; }
+function initials(name) { return name.split(" ").map(p => p[0]).slice(0, 2).join("").toUpperCase(); }
 function positionCategory(pos) {
   for (const [group, list] of Object.entries(POSITION_GROUPS)) if (list.includes(pos)) return group;
   return "Centrocampistas";
 }
 function findPlayer(id) { return state.players.find(p => p.id === id); }
+function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
-function nationOf(player) {
-  return player.nation || { flag: "🇪🇸", country: "España" };
-}
 function preferredFoot(player) {
   if (player.foot) return player.foot;
   return hashStr(player.name + "foot") % 5 === 0 ? "Izquierdo" : "Derecho";
@@ -590,14 +442,6 @@ function computeWage(player) {
   if (player.wage !== undefined) return player.wage;
   return Math.round((player.ovr * player.ovr * 10.25) / 1000) * 1000;
 }
-function statColor(v) {
-  if (v >= 80) return "text-emerald-400";
-  if (v >= 70) return "text-green-400";
-  if (v >= 60) return "text-yellow-400";
-  if (v >= 50) return "text-orange-400";
-  return "text-red-500";
-}
-
 function computeSubStats(player) {
   if (player.stats) return player.stats;
   const bias = {
@@ -608,13 +452,27 @@ function computeSubStats(player) {
   }[positionCategory(player.position)];
   const keys = ["ritmo", "tiro", "pase", "regate", "defensa", "fisico"];
   const out = {};
-  keys.forEach(k => {
-    const seed = hashStr(player.name + k);
-    out[k] = clamp(player.ovr + bias[k] + seededInt(seed, -6, 6), 35, 99);
-  });
+  keys.forEach(k => { out[k] = clamp(player.ovr + bias[k] + seededInt(hashStr(player.name + k), -6, 6), 35, 99); });
   return out;
 }
-
+function statColor(v) {
+  if (v >= 80) return "text-emerald-400";
+  if (v >= 70) return "text-green-400";
+  if (v >= 60) return "text-yellow-400";
+  if (v >= 50) return "text-orange-400";
+  return "text-red-500";
+}
+function nationOf(player) { return player.nation || { flag: "🇪🇸", country: "España" }; }
+function ensurePlayerExtras(p) {
+  if (p.health === undefined) p.health = clamp(90 + seededInt(hashStr(p.id + "health"), -15, 10), 55, 100);
+  if (p.chemistry === undefined) p.chemistry = clamp(70 + seededInt(hashStr(p.id + "chem"), -25, 25), 30, 100);
+  return p;
+}
+function moraleFace(chemistry) {
+  if (chemistry >= 80) return { icon: "fa-face-smile", color: "text-emerald-400" };
+  if (chemistry >= 50) return { icon: "fa-face-meh", color: "text-yellow-400" };
+  return { icon: "fa-face-frown", color: "text-red-400" };
+}
 function teamRating() {
   const sorted = [...state.players].sort((a, b) => b.ovr - a.ovr).slice(0, 11);
   return Math.round(sorted.reduce((s, p) => s + p.ovr, 0) / sorted.length);
@@ -623,30 +481,36 @@ function avgOf(list) {
   if (!list.length) return 0;
   return Math.round(list.reduce((s, p) => s + p.ovr, 0) / list.length);
 }
-function avgAge() {
-  return (state.players.reduce((s, p) => s + p.age, 0) / state.players.length).toFixed(1);
-}
-function totalMarketValue() {
-  return state.players.reduce((s, p) => s + computeMarketValue(p), 0);
-}
+function avgAge() { return (state.players.reduce((s, p) => s + p.age, 0) / state.players.length).toFixed(1); }
+function wageBill() { return state.players.reduce((s, p) => s + computeWage(p), 0); }
+function fmtDate(d) { return d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" }); }
+function addDays(date, days) { const d = new Date(date); d.setDate(d.getDate() + days); return d; }
 
-/* ============================================================
-   GENERACIÓN DE CLUB Y PLANTILLA (equipos que no son el FC Barcelona)
-   ============================================================ */
+function clubGradient(name) {
+  const h1 = hashStr(name) % 360, h2 = (h1 + 40) % 360;
+  return `linear-gradient(135deg, hsl(${h1},65%,40%), hsl(${h2},70%,28%))`;
+}
+function crestGradient(club) {
+  if (club.tag === "FCB") return "linear-gradient(135deg,#1d4ed8 0%,#b91c1c 55%,#eab308 100%)";
+  return clubGradient(club.name);
+}
+function leagueClubs(club) { return COUNTRIES[club.country].leagues[club.league]; }
+function pickRival(club) {
+  const others = leagueClubs(club).filter(c => c.name !== club.name);
+  return others.length ? pickRandom(others).name : "—";
+}
 function generateManagerName() {
   return MARKET_FIRST[Math.floor(Math.random() * MARKET_FIRST.length)] + " " + MARKET_LAST[Math.floor(Math.random() * MARKET_LAST.length)];
 }
 function generateClubSquad(rating) {
   const dist = [["POR", 3], ["DFC", 4], ["LI", 2], ["LD", 2], ["MCD", 2], ["MC", 3], ["MCO", 2], ["MI", 1], ["MD", 1], ["ED", 1], ["EI", 1], ["DC", 2]];
-  const usedNames = new Set();
+  const used = new Set();
   const players = [];
   dist.forEach(([pos, count]) => {
     for (let i = 0; i < count; i++) {
       let name;
-      do {
-        name = MARKET_FIRST[Math.floor(Math.random() * MARKET_FIRST.length)] + " " + MARKET_LAST[Math.floor(Math.random() * MARKET_LAST.length)];
-      } while (usedNames.has(name));
-      usedNames.add(name);
+      do { name = MARKET_FIRST[Math.floor(Math.random() * MARKET_FIRST.length)] + " " + MARKET_LAST[Math.floor(Math.random() * MARKET_LAST.length)]; } while (used.has(name));
+      used.add(name);
       const age = 18 + Math.floor(Math.random() * 17);
       const height = 170 + Math.floor(Math.random() * 25);
       const weight = 65 + Math.floor(Math.random() * 22);
@@ -656,82 +520,36 @@ function generateClubSquad(rating) {
   });
   return players;
 }
-function clubGradient(name) {
-  const h1 = hashStr(name) % 360;
-  const h2 = (h1 + 40) % 360;
-  return `linear-gradient(135deg, hsl(${h1},65%,40%), hsl(${h2},70%,28%))`;
-}
-function crestGradient(club) {
-  if (club.tag === "FCB") return "linear-gradient(135deg,#1d4ed8 0%,#b91c1c 55%,#eab308 100%)";
-  return clubGradient(club.name);
-}
-function buildKitColors(club) {
-  if (club.tag === "FCB") {
-    return {
-      home: "linear-gradient(180deg,#1e40af,#b91c1c,#1e3a8a)",
-      away: "linear-gradient(180deg,#fcd34d,#fbbf24,#eab308)"
-    };
-  }
-  const h = hashStr(club.name) % 360;
-  return {
-    home: `linear-gradient(180deg, hsl(${h},60%,35%), hsl(${(h + 20) % 360},55%,20%))`,
-    away: `linear-gradient(180deg, hsl(${(h + 150) % 360},70%,72%), hsl(${(h + 170) % 360},60%,52%))`
-  };
-}
-const KIT_GK_GRADIENT = "linear-gradient(180deg,#10b981,#059669,#065f46)";
-
-function leagueClubs(club) {
-  return COUNTRIES[club.country].leagues[club.league];
-}
-function pickRival(club) {
-  const others = leagueClubs(club).filter(c => c.name !== club.name);
-  if (!others.length) return "—";
-  return pickRandom(others).name;
-}
-
-const CLUB_HISTORY = {
-  "FC Barcelona": { founded: 1899, titles: "27 Ligas · 5 Champions League" }
-};
-function clubHistory(club) {
-  if (CLUB_HISTORY[club.name]) return CLUB_HISTORY[club.name];
-  const seed = hashStr(club.name);
-  const founded = 1880 + (seed % 45);
-  const leagueTitles = Math.max(0, Math.round((club.rating - 68) * 0.6 + seededInt(seed, 0, 4)));
-  return { founded, titles: leagueTitles > 0 ? `${leagueTitles} títulos de liga` : "Sin títulos de liga en su historia" };
-}
-function wageBill() {
-  return state.players.reduce((s, p) => s + computeWage(p), 0);
-}
 
 /* ============================================================
-   TÁCTICAS: FORMACIONES Y ONCE INICIAL
+   TÁCTICAS: FORMACIONES (orientación horizontal, portero a la izquierda)
    ============================================================ */
 const FORMATIONS = {
-  "4-3-3": { slots: [
-    { x: 50, y: 92, role: "POR" },
-    { x: 15, y: 74, role: "LI" }, { x: 38, y: 78, role: "DFC" }, { x: 62, y: 78, role: "DFC" }, { x: 85, y: 74, role: "LD" },
-    { x: 25, y: 52, role: "MC" }, { x: 50, y: 56, role: "MC" }, { x: 75, y: 52, role: "MC" },
-    { x: 15, y: 26, role: "EI" }, { x: 50, y: 15, role: "DC" }, { x: 85, y: 26, role: "ED" }
-  ] },
-  "4-4-2": { slots: [
-    { x: 50, y: 92, role: "POR" },
-    { x: 15, y: 74, role: "LI" }, { x: 38, y: 78, role: "DFC" }, { x: 62, y: 78, role: "DFC" }, { x: 85, y: 74, role: "LD" },
-    { x: 15, y: 50, role: "MI" }, { x: 38, y: 54, role: "MC" }, { x: 62, y: 54, role: "MC" }, { x: 85, y: 50, role: "MD" },
-    { x: 35, y: 17, role: "DC" }, { x: 65, y: 17, role: "DC" }
-  ] },
-  "4-2-3-1": { slots: [
-    { x: 50, y: 92, role: "POR" },
-    { x: 15, y: 74, role: "LI" }, { x: 38, y: 78, role: "DFC" }, { x: 62, y: 78, role: "DFC" }, { x: 85, y: 74, role: "LD" },
-    { x: 35, y: 58, role: "MCD" }, { x: 65, y: 58, role: "MCD" },
-    { x: 15, y: 33, role: "EI" }, { x: 50, y: 37, role: "MCO" }, { x: 85, y: 33, role: "ED" },
-    { x: 50, y: 13, role: "DC" }
-  ] },
-  "3-5-2": { slots: [
-    { x: 50, y: 92, role: "POR" },
-    { x: 25, y: 78, role: "DFC" }, { x: 50, y: 82, role: "DFC" }, { x: 75, y: 78, role: "DFC" },
-    { x: 10, y: 52, role: "LI" }, { x: 32, y: 56, role: "MC" }, { x: 50, y: 60, role: "MCD" }, { x: 68, y: 56, role: "MC" }, { x: 90, y: 52, role: "LD" },
-    { x: 35, y: 19, role: "DC" }, { x: 65, y: 19, role: "DC" }
-  ] }
+  "4-3-3": [
+    { x: 8, y: 50, role: "POR" },
+    { x: 24, y: 16, role: "LI" }, { x: 22, y: 38, role: "DFC" }, { x: 22, y: 62, role: "DFC" }, { x: 24, y: 84, role: "LD" },
+    { x: 48, y: 26, role: "MC" }, { x: 44, y: 50, role: "MC" }, { x: 48, y: 74, role: "MC" },
+    { x: 76, y: 16, role: "EI" }, { x: 87, y: 50, role: "DC" }, { x: 76, y: 84, role: "ED" }
+  ],
+  "4-4-2": [
+    { x: 8, y: 50, role: "POR" },
+    { x: 24, y: 16, role: "LI" }, { x: 22, y: 38, role: "DFC" }, { x: 22, y: 62, role: "DFC" }, { x: 24, y: 84, role: "LD" },
+    { x: 52, y: 12, role: "MI" }, { x: 46, y: 38, role: "MC" }, { x: 46, y: 62, role: "MC" }, { x: 52, y: 88, role: "MD" },
+    { x: 85, y: 34, role: "DC" }, { x: 85, y: 66, role: "DC" }
+  ],
+  "4-2-3-1": [
+    { x: 8, y: 50, role: "POR" },
+    { x: 24, y: 16, role: "LI" }, { x: 22, y: 38, role: "DFC" }, { x: 22, y: 62, role: "DFC" }, { x: 24, y: 84, role: "LD" },
+    { x: 42, y: 34, role: "MCD" }, { x: 42, y: 66, role: "MCD" },
+    { x: 68, y: 16, role: "EI" }, { x: 63, y: 50, role: "MCO" }, { x: 68, y: 84, role: "ED" },
+    { x: 88, y: 50, role: "DC" }
+  ],
+  "3-5-2": [
+    { x: 8, y: 50, role: "POR" },
+    { x: 22, y: 26, role: "DFC" }, { x: 18, y: 50, role: "DFC" }, { x: 22, y: 74, role: "DFC" },
+    { x: 46, y: 8, role: "LI" }, { x: 44, y: 30, role: "MC" }, { x: 40, y: 50, role: "MCD" }, { x: 44, y: 70, role: "MC" }, { x: 46, y: 92, role: "LD" },
+    { x: 82, y: 36, role: "DC" }, { x: 82, y: 64, role: "DC" }
+  ]
 };
 const MENTALITY_MULT = {
   "Defensiva": { home: 0.7, away: 0.6 },
@@ -739,7 +557,7 @@ const MENTALITY_MULT = {
   "Ofensiva": { home: 1.35, away: 1.55 }
 };
 function pickXI(formationKey) {
-  const slots = FORMATIONS[formationKey].slots;
+  const slots = FORMATIONS[formationKey];
   const used = new Set();
   return slots.map(slot => {
     let candidates = state.players.filter(p => !used.has(p.id) && p.positions.includes(slot.role));
@@ -750,11 +568,14 @@ function pickXI(formationKey) {
     if (!candidates.length) candidates = state.players.filter(p => !used.has(p.id));
     const best = candidates.sort((a, b) => b.ovr - a.ovr)[0];
     if (best) used.add(best.id);
-    return { slot, player: best || null };
+    return best || null;
   });
 }
+function autoAssignXI(formationKey) {
+  state.tactics.xiIds = pickXI(formationKey).map(p => p ? p.id : null);
+}
 function pickWeightedAttacker() {
-  const xiPlayers = state.tactics.xi.map(id => findPlayer(id)).filter(Boolean);
+  const xiPlayers = state.tactics.xiIds.map(findPlayer).filter(Boolean);
   const pool = xiPlayers.length ? xiPlayers : state.players;
   const weighted = [];
   pool.forEach(p => {
@@ -821,255 +642,455 @@ function simulateRemainingRoundMatches(roundIndex) {
   const round = state.season.fixtures[roundIndex];
   const clubsInfo = leagueClubs(state.club);
   round.forEach(([home, away]) => {
-    if (home === "BYE" || away === "BYE") return;
-    if (home === state.club.name || away === state.club.name) return;
-    const homeInfo = clubsInfo.find(c => c.name === home);
-    const awayInfo = clubsInfo.find(c => c.name === away);
-    if (!homeInfo || !awayInfo) return;
-    const [gh, ga] = quickSimScore(homeInfo.rating, awayInfo.rating);
-    applyResult(home, gh, ga);
-    applyResult(away, ga, gh);
+    if (home === "BYE" || away === "BYE" || home === state.club.name || away === state.club.name) return;
+    const h = clubsInfo.find(c => c.name === home), a = clubsInfo.find(c => c.name === away);
+    if (!h || !a) return;
+    const [gh, ga] = quickSimScore(h.rating, a.rating);
+    applyResult(home, gh, ga); applyResult(away, ga, gh);
   });
 }
 
 /* ============================================================
-   RENDER: TOP BAR
+   PANTALLA: SELECCIÓN DE CLUB
    ============================================================ */
-function renderTopBar() {
-  document.getElementById("topMoney").textContent = fmtMoney(state.money);
-  document.getElementById("topMorale").textContent = state.morale + "%";
-  if (!state.club) return;
-  const crest = document.getElementById("topClubCrest");
+function ratingRingSVG(rating) {
+  const r = 42, c = 2 * Math.PI * r;
+  const pct = clamp(rating / 99, 0, 1);
+  const offset = c * (1 - pct);
+  const color = rating >= 85 ? "#10b981" : rating >= 80 ? "#22c55e" : rating >= 75 ? "#eab308" : rating >= 70 ? "#f97316" : "#ef4444";
+  return `<svg width="120" height="120" viewBox="0 0 100 100" class="mx-auto">
+    <circle cx="50" cy="50" r="${r}" fill="none" stroke="#242a35" stroke-width="8"/>
+    <circle cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${offset}" transform="rotate(-90 50 50)"/>
+    <text x="50" y="46" text-anchor="middle" font-size="24" font-weight="900" fill="#fff">${rating}</text>
+    <text x="50" y="63" text-anchor="middle" font-size="9" fill="#9ca3af">MEDIA</text>
+  </svg>`;
+}
+function renderSelectScreen() {
+  const rail = document.getElementById("selectCountryRail");
+  rail.innerHTML = Object.keys(COUNTRIES).map(name => `
+    <button onclick="selectCountry('${name}')" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition ${state.selectedCountry === name ? "bg-emerald-500 text-black" : "text-gray-400 hover:bg-white/5"}">
+      <span class="text-base">${COUNTRIES[name].flag}</span> ${name}
+    </button>
+  `).join("");
+  if (!state.selectedCountry) selectCountry(Object.keys(COUNTRIES)[0], true);
+}
+function selectCountry(name, silent) {
+  state.selectedCountry = name;
+  state.selectedClub = null;
+  const leagueName = Object.keys(COUNTRIES[name].leagues)[0];
+  const clubs = COUNTRIES[name].leagues[leagueName];
+  document.getElementById("selectClubList").innerHTML = `
+    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3">${leagueName} · ${name}</p>
+    <div class="grid grid-cols-2 gap-2.5">
+      ${clubs.map((c, i) => `
+        <button onclick="selectClub(${i})" id="clubRow-${i}" class="card-sm p-3 flex items-center gap-3 text-left transition hover:bg-white/5">
+          <div class="w-10 h-10 rounded-lg flex items-center justify-center font-black text-[10px] shrink-0" style="background:${crestGradient(c)}">${c.tag}</div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-xs truncate">${c.name}${c.real ? " ⭐" : ""}</p>
+            <p class="text-[10px] text-gray-500">Plantilla ${c.real ? "real" : "generada"}</p>
+          </div>
+          <span class="text-[11px] font-black px-1.5 py-0.5 rounded shrink-0 ${ovrBadgeClass(c.rating)}">${c.rating}</span>
+        </button>
+      `).join("")}
+    </div>`;
+  if (!silent) renderClubDetail(null);
+  if (!silent) document.getElementById("selectClubDetail").innerHTML = `
+    <div class="h-full flex flex-col items-center justify-center text-center text-gray-600 gap-2">
+      <i class="fa-solid fa-shield-halved text-3xl"></i>
+      <p class="text-xs">Selecciona un club para ver sus detalles</p>
+    </div>`;
+}
+function selectClub(index) {
+  const leagueName = Object.keys(COUNTRIES[state.selectedCountry].leagues)[0];
+  const club = COUNTRIES[state.selectedCountry].leagues[leagueName][index];
+  state.selectedClub = { country: state.selectedCountry, league: leagueName, index, club };
+  document.querySelectorAll("[id^='clubRow-']").forEach(el => el.classList.remove("ring-2", "ring-emerald-400"));
+  document.getElementById("clubRow-" + index).classList.add("ring-2", "ring-emerald-400");
+  const isReal = !!club.real;
+  document.getElementById("selectClubDetail").innerHTML = `
+    <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center font-black text-lg mb-3" style="background:${crestGradient(club)}">${club.tag}</div>
+    <h3 class="text-center font-extrabold text-base">${club.name}</h3>
+    <p class="text-center text-[11px] text-gray-500 mb-3">${leagueName} · ${state.selectedCountry}</p>
+    ${ratingRingSVG(club.rating)}
+    <div class="space-y-2 mt-4 text-xs">
+      <div class="card-sm p-3 flex items-center justify-between"><span class="text-gray-500">Estadio</span><span class="font-semibold">${isReal ? "Spotify Camp Nou" : "Estadio " + club.name}</span></div>
+      <div class="card-sm p-3 flex items-center justify-between"><span class="text-gray-500">Capacidad</span><span class="font-semibold">${(isReal ? 99354 : 20000 + club.rating * 600).toLocaleString("es-ES")}</span></div>
+      <div class="card-sm p-3 flex items-center justify-between"><span class="text-gray-500">Presupuesto</span><span class="font-semibold text-emerald-400">${fmtMoney(club.rating * 500000 + 5000000)}</span></div>
+    </div>
+    <button onclick="startCareer()" class="w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-3 rounded-xl text-sm transition active:scale-[0.98]">
+      <i class="fa-solid fa-play mr-1.5"></i> Comenzar carrera
+    </button>`;
+}
+function renderClubDetail() {}
+
+/* ============================================================
+   INICIO DE CARRERA
+   ============================================================ */
+function startCareer() {
+  if (!state.selectedClub) return;
+  const { country, league, club } = state.selectedClub;
+  const isReal = !!club.real;
+  const countryInfo = COUNTRIES[country];
+  const clubObj = {
+    name: club.name, tag: club.tag, rating: club.rating,
+    country, countryFlag: countryInfo.flag, countryCode: countryInfo.code, league
+  };
+  clubObj.rival = pickRival(clubObj);
+  clubObj.stadiumName = isReal ? "Spotify Camp Nou" : "Estadio " + club.name;
+  clubObj.stadiumCapacity = isReal ? 99354 : 20000 + club.rating * 600 + Math.floor(Math.random() * 8000);
+
+  state.club = clubObj;
+  state.players = (isReal ? createBarcelonaSquad() : generateClubSquad(club.rating)).map(ensurePlayerExtras);
+  state.manager = isReal ? { name: "Hansi Flick", role: "Entrenador" } : { name: generateManagerName(), role: "Entrenador" };
+  state.money = Math.round(club.rating * 500_000 + 5_000_000);
+  state.coins = 1200;
+  state.morale = 78;
+  state.market = [];
+  state.tactics = { formation: "4-3-3", mentality: "Equilibrada", instructions: { style: "Posesión" }, penalty: null, freekick: null, xiIds: [], selectedBenchId: null };
+  state.season = buildSeason(clubObj);
+  state.season.startDate = new Date(2025, 7, 16);
+  state.currentDate = addDays(state.season.startDate, -5);
+  autoAssignXI(state.tactics.formation);
+  const options = state.players.slice().sort((a, b) => b.ovr - a.ovr);
+  state.tactics.penalty = options[0].id;
+  state.tactics.freekick = options[0].id;
+  generateInitialNews();
+  refreshMarket();
+
+  document.getElementById("screen-select").classList.add("hidden");
+  document.getElementById("screen-game").classList.remove("hidden");
+  buildSidebarNav();
+  switchView("dashboard");
+  renderAllViews();
+}
+function confirmExit() {
+  if (!confirm("¿Salir de la carrera actual? Se perderá el progreso.")) return;
+  location.reload();
+}
+
+/* ============================================================
+   NAVEGACIÓN LATERAL
+   ============================================================ */
+const NAV_ITEMS = [
+  { id: "dashboard", label: "Dashboard", icon: "fa-house" },
+  { id: "squad", label: "Plantilla", icon: "fa-people-group" },
+  { id: "tactics", label: "Tácticas", icon: "fa-chess-board" },
+  { id: "calendar", label: "Calendario", icon: "fa-calendar-days" },
+  { id: "transfers", label: "Traspasos", icon: "fa-right-left" }
+];
+function buildSidebarNav() {
+  document.getElementById("sidebarNav").innerHTML = NAV_ITEMS.map(item => `
+    <button data-view="${item.id}" onclick="switchView('${item.id}')" class="side-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition">
+      <i class="fa-solid ${item.icon} w-4 text-center"></i><span class="hidden lg:inline">${item.label}</span>
+    </button>
+  `).join("");
+}
+const VIEW_TITLES = { dashboard: "Dashboard", squad: "Plantilla", tactics: "Tácticas y Alineación", calendar: "Calendario / Partidos", transfers: "Traspasos y Finanzas" };
+function switchView(view) {
+  NAV_ITEMS.forEach(item => document.getElementById("view-" + item.id).classList.toggle("hidden", item.id !== view));
+  document.querySelectorAll(".side-link").forEach(btn => btn.classList.toggle("active", btn.dataset.view === view));
+  document.getElementById("viewTitle").textContent = VIEW_TITLES[view];
+  if (view === "squad") renderSquadScreen();
+  if (view === "tactics") renderTacticsScreen();
+  if (view === "calendar") { renderStandings(); renderFixtures(); }
+  if (view === "transfers") renderTransfers();
+}
+
+/* ============================================================
+   RENDER GLOBAL / TOP HEADER
+   ============================================================ */
+function renderTopHeader() {
+  const crest = document.getElementById("sidebarCrest");
   crest.textContent = state.club.tag;
   crest.style.background = crestGradient(state.club);
-  document.getElementById("topClubName").textContent = state.club.name;
-  document.getElementById("topClubLeague").textContent = state.club.league + " · " + state.club.country;
-  const badge = document.getElementById("clubRatingBadge");
-  const rating = teamRating();
-  badge.textContent = rating;
-  badge.className = "w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black " + ovrBadgeClass(rating);
+  document.getElementById("sidebarClubName").textContent = state.club.name;
+  document.getElementById("sidebarLeague").textContent = state.club.league;
+  document.getElementById("hdrCoins").textContent = state.coins.toLocaleString("es-ES");
+  document.getElementById("hdrMoney").textContent = fmtMoney(state.money);
+  document.getElementById("gameDate").textContent = fmtDate(state.currentDate);
+}
+function renderAllViews() {
+  renderTopHeader();
+  renderDashboard();
+  renderSquadScreen();
+  renderTacticsScreen();
+  renderStandings();
+  renderFixtures();
+  renderTransfers();
 }
 
 /* ============================================================
-   RENDER: CLUB VIEW
+   DASHBOARD
    ============================================================ */
-function renderClub() {
-  if (!state.club) return;
-  const rating = teamRating();
-  document.getElementById("statAvgAge").textContent = avgAge() + " años";
-  document.getElementById("statNation").textContent = state.club.countryFlag + " " + state.club.countryCode;
-  document.getElementById("statValue").textContent = fmtMoney(totalMarketValue() * 1_000_000);
-  document.getElementById("statRival").textContent = state.club.rival;
+function generateInitialNews() {
+  state.news = [];
+  const bench = [...state.players].sort((a, b) => a.ovr - b.ovr)[0];
+  addNews(`${bench.name} está preocupado por su falta de minutos en el once inicial.`);
+  addNews(`La directiva fija el presupuesto de fichajes en ${fmtMoney(state.money)}.`);
+  addNews(`${state.manager.name} presenta su primer plan de pretemporada en ${state.club.stadiumName}.`);
+}
+function addNews(text) {
+  state.news.unshift({ text, time: fmtDate(state.currentDate) });
+  state.news = state.news.slice(0, 8);
+}
+function renderDashboard() {
+  const fixture = state.season.userFixtures.find(f => !f.played);
+  const wrap = document.getElementById("widgetNextMatch");
+  if (fixture) {
+    const oppInfo = leagueClubs(state.club).find(c => c.name === fixture.opponent);
+    const matchDate = addDays(state.season.startDate, fixture.round * 7);
+    wrap.innerHTML = `
+      <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3">Próximo partido · Jornada ${fixture.round + 1}</p>
+      <div class="flex items-center justify-between">
+        <div class="text-center flex-1">
+          <div class="w-14 h-14 mx-auto rounded-xl flex items-center justify-center font-black text-xs" style="background:${crestGradient(state.club)}">${state.club.tag}</div>
+          <p class="text-xs font-bold mt-2 truncate">${state.club.name}</p>
+        </div>
+        <p class="text-gray-500 font-black text-lg px-4">VS</p>
+        <div class="text-center flex-1">
+          <div class="w-14 h-14 mx-auto rounded-xl flex items-center justify-center font-black text-xs" style="background:${oppInfo ? crestGradient(oppInfo) : "#374151"}">${oppInfo ? oppInfo.tag : "RIV"}</div>
+          <p class="text-xs font-bold mt-2 truncate">${fixture.opponent}</p>
+        </div>
+      </div>
+      <div class="flex items-center justify-center gap-4 mt-4 text-[11px] text-gray-400">
+        <span><i class="fa-solid fa-calendar mr-1.5"></i>${fmtDate(matchDate)}</span>
+        <span><i class="fa-solid fa-location-dot mr-1.5"></i>${fixture.home ? state.club.stadiumName : "Fuera de casa"}</span>
+      </div>`;
+  } else {
+    wrap.innerHTML = `<p class="text-center text-sm text-gray-500 py-6"><i class="fa-solid fa-trophy mr-2"></i>Temporada finalizada</p>`;
+  }
 
-  const kits = state.club.kitColors;
-  document.getElementById("kitHome").style.background = kits.home;
-  document.getElementById("kitAway").style.background = kits.away;
-  document.getElementById("kitGk").style.background = KIT_GK_GRADIENT;
+  document.getElementById("widgetNews").innerHTML = `
+    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3"><i class="fa-solid fa-envelope mr-1.5"></i>Bandeja de entrada</p>
+    <div class="flex-1 overflow-y-auto space-y-2.5 pr-1">
+      ${state.news.map(n => `
+        <div class="card-sm p-2.5">
+          <p class="text-xs leading-snug">${n.text}</p>
+          <p class="text-[10px] text-gray-600 mt-1">${n.time}</p>
+        </div>
+      `).join("")}
+    </div>`;
 
-  document.getElementById("stadiumName").textContent = state.club.stadiumName;
-  document.getElementById("stadiumCapacity").textContent = "Capacidad · " + state.club.stadiumCapacity.toLocaleString("es-ES") + " espectadores";
+  const rows = Object.entries(state.season.table).map(([name, t]) => ({ name, ...t, dg: t.gf - t.ga }));
+  rows.sort((a, b) => b.points - a.points || b.dg - a.dg);
+  const myPos = rows.findIndex(r => r.name === state.club.name) + 1;
+  document.getElementById("widgetStandings").innerHTML = `
+    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3">Clasificación</p>
+    <div class="space-y-1.5">
+      ${rows.slice(0, 5).map((r, i) => `
+        <div class="flex items-center justify-between text-xs ${r.name === state.club.name ? "text-emerald-400 font-bold" : "text-gray-400"}">
+          <span class="w-5">${i + 1}</span><span class="flex-1 truncate">${r.name}</span><span class="font-black">${r.points}</span>
+        </div>
+      `).join("")}
+    </div>`;
 
   const best = [...state.players].sort((a, b) => b.ovr - a.ovr)[0];
-  const bestU21 = [...state.players].filter(p => p.age <= 21).sort((a, b) => b.ovr - a.ovr)[0];
-
-  const cards = [
-    { label: "Mánager", name: state.manager.name, sub: state.manager.role, ovr: null },
-    { label: "Mejor jugador", name: best.name, sub: POSITION_LABELS[best.position], ovr: best.ovr },
-    { label: "Mejor Sub-21", name: bestU21 ? bestU21.name : "—", sub: bestU21 ? POSITION_LABELS[bestU21.position] : "", ovr: bestU21 ? bestU21.ovr : null }
-  ];
-  document.getElementById("squadHighlights").innerHTML = cards.map(c => `
-    <div class="card-sm p-3 flex flex-col items-center text-center gap-1.5">
-      <div class="w-12 h-12 rounded-full flex items-center justify-center font-black text-sm" style="background:${avatarColor(c.name)}">${initials(c.name)}</div>
-      <p class="text-[9px] text-gray-500 font-bold uppercase">${c.label}</p>
-      <p class="text-xs font-bold leading-tight">${c.name}</p>
-      ${c.ovr !== null ? `<span class="text-[10px] font-black px-1.5 py-0.5 rounded ${ovrBadgeClass(c.ovr)}">${c.ovr}</span>` : `<p class="text-[10px] text-gray-500">${c.sub}</p>`}
-    </div>
-  `).join("");
-
-  const gk = state.players.filter(p => p.position === "POR");
-  const def = state.players.filter(p => POSITION_GROUPS["Defensas"].includes(p.position));
-  const mid = state.players.filter(p => POSITION_GROUPS["Centrocampistas"].includes(p.position));
-  const fwd = state.players.filter(p => POSITION_GROUPS["Delanteros"].includes(p.position));
-  const stats = [
-    { label: "GRL", value: rating },
-    { label: "ATA", value: avgOf(fwd) },
-    { label: "CEN", value: avgOf(mid) },
-    { label: "DEF", value: avgOf([...def, ...gk]) }
-  ];
-  document.getElementById("teamStatsBlock").innerHTML = stats.map(s => `
-    <div>
-      <div class="w-11 h-11 mx-auto rounded-lg flex items-center justify-center font-black text-sm ${ovrBadgeClass(s.value)}">${s.value}</div>
-      <p class="text-[10px] text-gray-500 font-bold mt-1.5">${s.label}</p>
-    </div>
-  `).join("");
-
-  const hist = clubHistory(state.club);
-  document.getElementById("clubHistoryBlock").innerHTML = `
-    <div class="flex items-center gap-4">
-      <div class="w-11 h-11 rounded-lg bg-white/5 flex items-center justify-center text-emerald-400 shrink-0"><i class="fa-solid fa-scroll text-sm"></i></div>
-      <div>
-        <p class="text-sm font-semibold">Fundado en ${hist.founded}</p>
-        <p class="text-xs text-gray-500 mt-0.5">${hist.titles}</p>
+  const objective = myPos <= 4 ? { label: "Clasificación europea", pct: 80, color: "bg-emerald-500" } : myPos <= (rows.length - 3) ? { label: "Permanencia encarrilada", pct: 55, color: "bg-yellow-400" } : { label: "Zona de descenso", pct: 25, color: "bg-red-500" };
+  document.getElementById("widgetSpotlight").innerHTML = `
+    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3">Jugador en foco</p>
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-full flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(best.name)}">${initials(best.name)}</div>
+      <div class="min-w-0">
+        <p class="font-bold text-sm truncate">${best.name}</p>
+        <p class="text-[10px] text-gray-500">${POSITION_LABELS[best.position]}</p>
       </div>
+      <span class="ml-auto text-sm font-black px-2 py-1 rounded ${ovrBadgeClass(best.ovr)}">${best.ovr}</span>
     </div>
-  `;
+    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mt-4 mb-1.5">Objetivo de temporada</p>
+    <p class="text-xs font-semibold mb-1.5">${objective.label} (${myPos}º)</p>
+    <div class="h-1.5 rounded-full bg-white/10 overflow-hidden"><div class="h-full ${objective.color}" style="width:${objective.pct}%"></div></div>`;
 }
 
 /* ============================================================
-   RENDER: SQUAD VIEW
+   PLANTILLA
    ============================================================ */
-function renderSquad() {
-  document.getElementById("squadCount").textContent = state.players.length + " jugadores";
+function squadBucket(tab) {
+  const sorted = [...state.players].sort((a, b) => b.ovr - a.ovr);
+  if (tab === "primero") return sorted.slice(0, 18);
+  if (tab === "suplentes") return sorted.slice(18);
+  return [];
+}
+function renderSquadScreen() {
   document.getElementById("squadAvgAge").textContent = avgAge();
   document.getElementById("squadAvgOvr").textContent = avgOf(state.players);
+  const tabs = [{ id: "primero", label: "Primer equipo" }, { id: "suplentes", label: "Suplentes" }, { id: "cedidos", label: "Cedidos" }];
+  document.getElementById("squadTabs").innerHTML = tabs.map(t => `
+    <button onclick="setSquadTab('${t.id}')" class="tab-pill px-3.5 py-2 rounded-full text-xs font-bold transition ${state.squadTab === t.id ? "active" : ""}">${t.label}</button>
+  `).join("");
 
-  const sorted = [...state.players].sort((a, b) => b.ovr - a.ovr);
-  document.getElementById("squadGrid").innerHTML = sorted.map(p => {
-    const nation = nationOf(p);
+  const list = squadBucket(state.squadTab);
+  const table = document.getElementById("squadTable");
+  if (!list.length) {
+    table.innerHTML = `<tbody><tr><td class="text-center text-gray-600 text-xs py-8">No hay jugadores en esta categoría.</td></tr></tbody>`;
+    return;
+  }
+  table.innerHTML = `
+    <thead>
+      <tr class="text-gray-500 text-left text-[10px] uppercase">
+        <th class="py-2 pr-2">Pos</th><th class="py-2 pr-2"></th><th class="py-2 pr-2">Jugador</th>
+        <th class="py-2 px-2 text-center">OVR</th><th class="py-2 px-2 text-center">POT</th>
+        <th class="py-2 px-2 text-center">Edad</th><th class="py-2 px-2 text-center">Valor</th>
+        <th class="py-2 px-2 text-center">Salud</th><th class="py-2 pl-2 text-center">Moral</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${list.map(p => {
+        const face = moraleFace(p.chemistry);
+        return `
+        <tr class="border-t border-white/5 hover:bg-white/5 cursor-pointer" onclick="openPlayerModal('${p.id}')">
+          <td class="py-2 pr-2"><span class="text-[10px] font-black px-1.5 py-0.5 rounded ${positionZoneClass(p.position)}">${p.position}</span></td>
+          <td class="py-2 pr-2 text-base">${nationOf(p).flag}</td>
+          <td class="py-2 pr-2 font-semibold truncate max-w-[160px]">${p.name}</td>
+          <td class="py-2 px-2 text-center"><span class="text-[11px] font-black px-1.5 py-0.5 rounded ${ovrBadgeClass(p.ovr)}">${p.ovr}</span></td>
+          <td class="py-2 px-2 text-center text-gray-500">-</td>
+          <td class="py-2 px-2 text-center text-gray-400">${p.age}</td>
+          <td class="py-2 px-2 text-center text-gray-400">${fmtMoney(computeMarketValue(p) * 1_000_000)}</td>
+          <td class="py-2 px-2 text-center text-gray-400">${p.health}%</td>
+          <td class="py-2 pl-2 text-center">
+            <div class="flex items-center justify-center gap-1.5">
+              <i class="fa-solid ${face.icon} ${face.color}"></i>
+              <span class="w-10 h-1.5 rounded-full bg-white/10 overflow-hidden inline-block"><span class="h-full block bg-emerald-500" style="width:${p.chemistry}%"></span></span>
+            </div>
+          </td>
+        </tr>`;
+      }).join("")}
+    </tbody>`;
+}
+function setSquadTab(tab) { state.squadTab = tab; renderSquadScreen(); }
+
+/* ============================================================
+   TÁCTICAS
+   ============================================================ */
+function renderTacticsScreen() {
+  document.getElementById("formationTabs").innerHTML = Object.keys(FORMATIONS).map(f => `
+    <button onclick="selectFormation('${f}')" class="tab-pill px-3 py-1.5 rounded-full text-[11px] font-bold transition ${state.tactics.formation === f ? "active" : ""}">${f}</button>
+  `).join("");
+  renderPitch();
+  document.getElementById("tacticsSubTabs").innerHTML = ["suplentes", "instrucciones", "roles"].map(t => `
+    <button onclick="setTacticsSubTab('${t}')" class="tab-pill flex-1 px-2 py-2 rounded-lg text-[11px] font-bold capitalize transition ${state.tactics.tab === t || (state.tacticsSubTab === t) ? "active" : ""}">${t}</button>
+  `).join("");
+  renderTacticsSidePanel();
+}
+function selectFormation(f) { state.tactics.formation = f; autoAssignXI(f); renderTacticsScreen(); }
+function setTacticsSubTab(tab) { state.tacticsSubTab = tab; renderTacticsScreen(); }
+function renderPitch() {
+  const slots = FORMATIONS[state.tactics.formation];
+  document.getElementById("pitchViewH").innerHTML = slots.map((slot, i) => {
+    const player = findPlayer(state.tactics.xiIds[i]);
     return `
-    <button onclick="openPlayerModal('${p.id}')" class="card p-3 flex items-center gap-3 text-left active:scale-[0.98] transition">
-      <div class="w-14 h-14 rounded-xl bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center shrink-0">
-        <i class="fa-solid fa-user text-2xl text-slate-500"></i>
-      </div>
-      <div class="flex-1 min-w-0">
-        <p class="font-bold text-sm truncate">${p.name}</p>
-        <p class="text-xs font-semibold mt-0.5">
-          <span class="text-emerald-400">${p.position}</span>
-          <span class="text-gray-500">${p.positions.length > 1 ? " " + p.positions.slice(1).join(" ") : ""}</span>
-        </p>
-        <p class="text-xs text-gray-400 font-semibold mt-1">${fmtMoney(computeMarketValue(p) * 1_000_000)} · ${fmtMoney(computeWage(p))}</p>
-      </div>
-      <div class="flex flex-col items-end gap-1.5 shrink-0">
-        <div class="flex items-start gap-2.5">
-          <div class="text-center">
-            <p class="text-xl font-black leading-none ${statColor(p.ovr)}">${p.ovr}</p>
-            <p class="text-[8px] text-gray-500 font-bold mt-1">GRL</p>
-          </div>
-          <div class="text-center">
-            <p class="text-xl font-black leading-none text-gray-600">-</p>
-            <p class="text-[8px] text-gray-500 font-bold mt-1">POT</p>
-          </div>
+    <button onclick="trySwapIntoSlot(${i})" class="pitch-token absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1" style="left:${slot.x}%; top:${slot.y}%">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center text-[10px] font-black border-2 ${state.tactics.selectedBenchId ? "border-emerald-400" : "border-white/30"} shadow-lg" style="background:${player ? avatarColor(player.name) : "#374151"}">${player ? initials(player.name) : "-"}</div>
+      <p class="text-[8px] font-bold text-white bg-black/60 px-1 rounded truncate max-w-[60px]">${player ? player.name.split(" ").slice(-1)[0] : slot.role}</p>
+      ${player ? `<span class="text-[9px] font-black px-1 rounded ${ovrBadgeClass(player.ovr)}">${player.ovr}</span>` : ""}
+    </button>`;
+  }).join("");
+}
+function renderTacticsSidePanel() {
+  const panel = document.getElementById("tacticsSidePanel");
+  if (state.tacticsSubTab === "suplentes") {
+    const bench = state.players.filter(p => !state.tactics.xiIds.includes(p.id)).sort((a, b) => b.ovr - a.ovr);
+    panel.innerHTML = bench.map(p => `
+      <button onclick="selectBenchPlayer('${p.id}')" class="w-full flex items-center gap-2.5 p-2.5 rounded-lg mb-1.5 text-left transition ${state.tactics.selectedBenchId === p.id ? "bg-emerald-500/20 ring-1 ring-emerald-400" : "hover:bg-white/5"}">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-[9px] shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
+        <div class="flex-1 min-w-0">
+          <p class="text-xs font-semibold truncate">${p.name}</p>
+          <p class="text-[10px] text-gray-500">${p.position}</p>
         </div>
-        <div class="flex items-center gap-1 text-[11px] text-gray-300 font-semibold">
-          <span>${nation.flag}</span><span>${nation.country}</span>
-        </div>
+        <span class="text-[10px] font-black px-1.5 py-0.5 rounded ${ovrBadgeClass(p.ovr)}">${p.ovr}</span>
+      </button>
+    `).join("") || `<p class="text-xs text-gray-600 italic p-2">No quedan suplentes disponibles.</p>`;
+  } else if (state.tacticsSubTab === "instrucciones") {
+    panel.innerHTML = `
+      <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Mentalidad</p>
+      <div class="grid grid-cols-3 gap-1.5 mb-4">
+        ${Object.keys(MENTALITY_MULT).map(m => `<button onclick="selectMentality('${m}')" class="tab-pill py-2 rounded-lg text-[10px] font-bold transition ${state.tactics.mentality === m ? "active" : ""}">${m}</button>`).join("")}
       </div>
-    </button>
-  `;
+      <p class="text-[10px] font-bold text-gray-500 uppercase mb-2">Estilo de ataque</p>
+      <div class="grid grid-cols-2 gap-1.5">
+        ${["Posesión", "Directo"].map(s => `<button onclick="selectStyle('${s}')" class="tab-pill py-2 rounded-lg text-[10px] font-bold transition ${state.tactics.instructions.style === s ? "active" : ""}">${s}</button>`).join("")}
+      </div>`;
+  } else {
+    const options = [...state.players].sort((a, b) => b.ovr - a.ovr).map(p => `<option value="${p.id}">${p.name} (${p.ovr})</option>`).join("");
+    panel.innerHTML = `
+      <div class="space-y-1.5 mb-4">
+        <label class="text-[10px] font-bold text-gray-500 uppercase">Lanzador de penaltis</label>
+        <select onchange="state.tactics.penalty=this.value" class="w-full bg-[#0b0c10] border border-white/10 rounded-lg px-3 py-2.5 text-xs">${options}</select>
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-[10px] font-bold text-gray-500 uppercase">Lanzador de faltas</label>
+        <select onchange="state.tactics.freekick=this.value" class="w-full bg-[#0b0c10] border border-white/10 rounded-lg px-3 py-2.5 text-xs">${options}</select>
+      </div>`;
+    setTimeout(() => {
+      const selects = panel.querySelectorAll("select");
+      if (selects[0]) selects[0].value = state.tactics.penalty;
+      if (selects[1]) selects[1].value = state.tactics.freekick;
+    }, 0);
+  }
+}
+function selectMentality(m) { state.tactics.mentality = m; renderTacticsSidePanel(); }
+function selectStyle(s) { state.tactics.instructions.style = s; renderTacticsSidePanel(); }
+function selectBenchPlayer(id) {
+  state.tactics.selectedBenchId = state.tactics.selectedBenchId === id ? null : id;
+  renderPitch();
+  renderTacticsSidePanel();
+}
+function trySwapIntoSlot(slotIndex) {
+  if (!state.tactics.selectedBenchId) return;
+  state.tactics.xiIds[slotIndex] = state.tactics.selectedBenchId;
+  state.tactics.selectedBenchId = null;
+  renderPitch();
+  renderTacticsSidePanel();
+}
+
+/* ============================================================
+   CALENDARIO
+   ============================================================ */
+function renderStandings() {
+  if (!state.season) return;
+  const rows = Object.entries(state.season.table).map(([name, t]) => ({ name, ...t, dg: t.gf - t.ga }));
+  rows.sort((a, b) => b.points - a.points || b.dg - a.dg || b.gf - a.gf);
+  document.getElementById("roundLabel").textContent = `Jornada ${Math.min(state.season.round + 1, state.season.fixtures.length)} / ${state.season.fixtures.length}`;
+  document.getElementById("standingsTable").innerHTML = `
+    <thead><tr class="text-gray-500 text-left"><th class="py-1 pr-1">#</th><th class="py-1 pr-1">Club</th><th class="py-1 px-1 text-center">PJ</th><th class="py-1 px-1 text-center">DG</th><th class="py-1 pl-1 text-center">Pts</th></tr></thead>
+    <tbody>
+      ${rows.map((r, i) => `
+        <tr class="${r.name === state.club.name ? "bg-emerald-500/10" : ""} border-t border-white/5">
+          <td class="py-1.5 pr-1 text-gray-500">${i + 1}</td>
+          <td class="py-1.5 pr-1 font-semibold truncate max-w-[110px]">${r.name}</td>
+          <td class="py-1.5 px-1 text-center text-gray-400">${r.played}</td>
+          <td class="py-1.5 px-1 text-center text-gray-400">${r.dg > 0 ? "+" : ""}${r.dg}</td>
+          <td class="py-1.5 pl-1 text-center font-black text-emerald-400">${r.points}</td>
+        </tr>
+      `).join("")}
+    </tbody>`;
+}
+function renderFixtures() {
+  if (!state.season) return;
+  document.getElementById("fixtureList").innerHTML = state.season.userFixtures.map(f => {
+    const right = f.played
+      ? `<span class="font-black text-sm ${f.gf > f.ga ? "text-emerald-400" : f.gf === f.ga ? "text-gray-400" : "text-red-400"}">${f.gf} - ${f.ga}</span>`
+      : `<span class="text-[10px] text-gray-500 font-semibold">Pendiente</span>`;
+    return `
+    <div class="card-sm p-3 flex items-center justify-between gap-2">
+      <div class="min-w-0">
+        <p class="text-[10px] text-gray-500 font-bold">Jornada ${f.round + 1} · ${f.home ? "Local" : "Visitante"} · ${fmtDate(addDays(state.season.startDate, f.round * 7))}</p>
+        <p class="text-sm font-semibold truncate">${f.opponent}</p>
+      </div>
+      ${right}
+    </div>`;
   }).join("");
 }
 
 /* ============================================================
-   RENDER: TÁCTICAS
+   TRASPASOS Y FINANZAS
    ============================================================ */
-function renderTactics() {
-  document.getElementById("formationButtons").innerHTML = Object.keys(FORMATIONS).map(f => `
-    <button onclick="selectFormation('${f}')" class="py-2.5 rounded-xl text-xs font-bold transition ${state.tactics.formation === f ? "bg-emerald-500 text-black" : "bg-white/5 text-gray-300"}">${f}</button>
-  `).join("");
-
-  document.getElementById("mentalityButtons").innerHTML = Object.keys(MENTALITY_MULT).map(m => `
-    <button onclick="selectMentality('${m}')" class="py-2.5 rounded-xl text-xs font-bold transition ${state.tactics.mentality === m ? "bg-emerald-500 text-black" : "bg-white/5 text-gray-300"}">${m}</button>
-  `).join("");
-
-  const xi = pickXI(state.tactics.formation);
-  state.tactics.xi = xi.map(x => x.player && x.player.id).filter(Boolean);
-  document.getElementById("pitchView").innerHTML = xi.map(({ slot, player }) => `
-    <div class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1" style="left:${slot.x}%; top:${slot.y}%">
-      <div class="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white/30 shadow-lg" style="background:${player ? avatarColor(player.name) : "#374151"}">${player ? initials(player.name) : "-"}</div>
-      <p class="text-[8px] font-bold text-white bg-black/60 px-1 py-0.5 rounded truncate max-w-[56px]">${player ? player.name.split(" ").slice(-1)[0] : slot.role}</p>
-    </div>
-  `).join("");
-
-  const options = [...state.players].sort((a, b) => b.ovr - a.ovr).map(p => `<option value="${p.id}">${p.name} (${p.ovr})</option>`).join("");
-  const penSel = document.getElementById("penaltyTakerSelect");
-  penSel.innerHTML = options;
-  if (state.tactics.penalty && findPlayer(state.tactics.penalty)) penSel.value = state.tactics.penalty;
-  else state.tactics.penalty = penSel.value;
-  const fkSel = document.getElementById("freekickTakerSelect");
-  fkSel.innerHTML = options;
-  if (state.tactics.freekick && findPlayer(state.tactics.freekick)) fkSel.value = state.tactics.freekick;
-  else state.tactics.freekick = fkSel.value;
+function renderTransfers() {
+  if (!state.club) return;
+  document.getElementById("txMoney").textContent = fmtMoney(state.money);
+  document.getElementById("txWageBill").textContent = fmtMoney(wageBill());
+  document.getElementById("txIncome").textContent = fmtMoney(Math.round(state.club.stadiumCapacity * 45));
+  if (state.market.length === 0) refreshMarket(); else renderMarket();
 }
-function selectFormation(f) { state.tactics.formation = f; renderTactics(); }
-function selectMentality(m) { state.tactics.mentality = m; renderTactics(); }
-
-/* ============================================================
-   MODAL DE JUGADOR
-   ============================================================ */
-function openPlayerModal(id) {
-  const p = findPlayer(id);
-  if (!p) return;
-  state.currentModalPlayerId = id;
-
-  document.getElementById("modalName").textContent = p.name;
-  document.getElementById("modalAge").textContent = p.age;
-  document.getElementById("modalPrimaryPos").textContent = p.position;
-  document.getElementById("modalOtherPos").textContent = p.positions.slice(1).join(" ");
-
-  const ovrEl = document.getElementById("modalOvr");
-  ovrEl.textContent = p.ovr;
-  ovrEl.className = "text-3xl font-black mt-0.5 " + statColor(p.ovr);
-
-  document.getElementById("modalPotential").textContent = "-";
-
-  document.getElementById("modalValue").textContent = fmtMoney(computeMarketValue(p) * 1_000_000);
-  document.getElementById("modalWage").textContent = fmtMoney(computeWage(p)) + "/sem";
-  document.getElementById("modalFoot").textContent = preferredFoot(p);
-
-  const stats = computeSubStats(p);
-  const labels = { ritmo: "RIT", tiro: "TIR", pase: "PAS", regate: "REG", defensa: "DEF", fisico: "FÍS" };
-  document.getElementById("modalStats").innerHTML = Object.entries(stats).map(([k, v]) => `
-    <div>
-      <p class="text-[11px] text-gray-500 font-semibold">${labels[k]}</p>
-      <p class="text-xl font-black mt-0.5 ${statColor(v)}">${v}</p>
-    </div>
-  `).join("");
-
-  const select = document.getElementById("modalPositionSelect");
-  select.innerHTML = Object.entries(POSITION_GROUPS).map(([group, positions]) => `
-    <optgroup label="${group}">
-      ${positions.map(pos => `<option value="${pos}" ${pos === p.position ? "selected" : ""}>${pos} — ${POSITION_LABELS[pos]}</option>`).join("")}
-    </optgroup>
-  `).join("");
-
-  document.getElementById("playerModal").classList.remove("hidden");
-}
-function closePlayerModal() {
-  document.getElementById("playerModal").classList.add("hidden");
-  state.currentModalPlayerId = null;
-}
-document.getElementById("playerModal").addEventListener("click", closePlayerModal);
-
-function savePlayerPosition() {
-  const p = findPlayer(state.currentModalPlayerId);
-  if (!p) return;
-  const newPos = document.getElementById("modalPositionSelect").value;
-  p.position = newPos;
-  p.positions = [newPos];
-  closePlayerModal();
-  renderSquad();
-  renderClub();
-}
-function sellCurrentPlayer() {
-  const p = findPlayer(state.currentModalPlayerId);
-  if (!p) return;
-  if (state.players.length <= 15) {
-    alert("No puedes vender más jugadores: la plantilla necesita un mínimo de 15.");
-    return;
-  }
-  if (!confirm(`¿Vender a ${p.name} por ${fmtMoney(p.ovr * p.ovr * 700)}?`)) return;
-  const price = p.ovr * p.ovr * 700;
-  state.money += price;
-  state.players = state.players.filter(pl => pl.id !== p.id);
-  closePlayerModal();
-  renderTopBar();
-  renderSquad();
-  renderClub();
-}
-
-/* ============================================================
-   MERCADO
-   ============================================================ */
 function generateMarketPlayer() {
   const allPos = Object.values(POSITION_GROUPS).flat();
   const pos = allPos[Math.floor(Math.random() * allPos.length)];
@@ -1088,23 +1109,17 @@ function refreshMarket() {
 function buyPlayer(mid) {
   const p = state.market.find(pl => pl.mid === mid);
   if (!p) return;
-  if (state.money < p.price) {
-    alert("No tienes suficiente presupuesto para este fichaje.");
-    return;
-  }
+  if (state.money < p.price) { alert("No tienes suficiente presupuesto para este fichaje."); return; }
   if (!confirm(`¿Fichar a ${p.name} por ${fmtMoney(p.price)}?`)) return;
   state.money -= p.price;
-  state.players.push(makePlayer({ name: p.name, positions: p.positions, age: p.age, height: p.height, weight: p.weight, ovr: p.ovr }));
+  state.players.push(ensurePlayerExtras(makePlayer({ name: p.name, positions: p.positions, age: p.age, height: p.height, weight: p.weight, ovr: p.ovr })));
   state.market = state.market.filter(pl => pl.mid !== mid);
-  renderTopBar();
-  renderMarket();
-  renderSquad();
-  renderClub();
+  renderTopHeader(); renderMarket(); renderSquadScreen();
 }
 function renderMarket() {
   document.getElementById("marketList").innerHTML = state.market.map(p => `
-    <div class="card p-3.5 flex items-center gap-3">
-      <div class="w-11 h-11 rounded-full flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
+    <div class="card-sm p-3 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
       <div class="flex-1 min-w-0">
         <p class="font-bold text-xs truncate">${p.name}</p>
         <p class="text-[10px] text-gray-500 font-semibold">${p.position} · ${p.age} años</p>
@@ -1117,542 +1132,118 @@ function renderMarket() {
 }
 
 /* ============================================================
-   RENDER: OFICINA (presupuesto + ojeadores)
+   SIMULACIÓN DE PARTIDO (avance rápido desde el botón Continuar)
    ============================================================ */
-function renderOffice() {
-  document.getElementById("officeMoney").textContent = fmtMoney(state.money);
-  document.getElementById("officeWageBill").textContent = fmtMoney(wageBill());
-  document.getElementById("scoutList").innerHTML = state.scoutReports.length ? state.scoutReports.map(p => `
-    <div class="card-sm p-3 flex items-center gap-3">
-      <div class="w-11 h-11 rounded-full flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
-      <div class="flex-1 min-w-0">
-        <p class="font-bold text-xs truncate">${p.name}</p>
-        <p class="text-[10px] text-gray-500 font-semibold">${p.position} · ${p.age} años · joven promesa</p>
-      </div>
-      <span class="text-[11px] font-black px-1.5 py-0.5 rounded ${ovrBadgeClass(p.ovr)}">${p.ovr}</span>
-      <button onclick="signScoutedPlayer('${p.id}')" class="text-[11px] font-bold bg-emerald-500 hover:bg-emerald-400 text-black px-3 py-2 rounded-lg shrink-0">${fmtMoney(p.scoutPrice)}</button>
-    </div>
-  `).join("") : `<p class="text-xs text-gray-600 italic">Envía un ojeador para descubrir jóvenes talentos.</p>`;
-  if (state.market.length === 0) refreshMarket(); else renderMarket();
-}
-function scoutPlayer() {
-  const cost = 500000;
-  if (state.money < cost) { alert("No tienes presupuesto suficiente para enviar un ojeador (500k€)."); return; }
-  state.money -= cost;
-  const allPos = Object.values(POSITION_GROUPS).flat();
-  const pos = pickRandom(allPos);
-  const name = MARKET_FIRST[Math.floor(Math.random() * MARKET_FIRST.length)] + " " + MARKET_LAST[Math.floor(Math.random() * MARKET_LAST.length)];
-  const age = 16 + Math.floor(Math.random() * 5);
-  const height = 170 + Math.floor(Math.random() * 20);
-  const weight = 62 + Math.floor(Math.random() * 18);
-  const ovr = 62 + Math.floor(Math.random() * 16);
-  const player = makePlayer({ name, positions: [pos], age, height, weight, ovr });
-  player.scoutPrice = Math.round(computeMarketValue(player) * 1_000_000 * 0.55);
-  state.scoutReports.push(player);
-  renderTopBar();
-  renderOffice();
-}
-function signScoutedPlayer(id) {
-  const p = state.scoutReports.find(pl => pl.id === id);
-  if (!p) return;
-  if (state.money < p.scoutPrice) { alert("No tienes presupuesto suficiente para fichar a este jugador."); return; }
-  if (!confirm(`¿Fichar a ${p.name} por ${fmtMoney(p.scoutPrice)}?`)) return;
-  state.money -= p.scoutPrice;
-  state.players.push(p);
-  state.scoutReports = state.scoutReports.filter(pl => pl.id !== id);
-  renderTopBar();
-  renderOffice();
-  renderSquad();
-  renderClub();
-}
-
-/* ============================================================
-   SIMULADOR DE PARTIDO
-   ============================================================ */
-function renderMatchTeam() {
-  if (!state.club) return;
-  const crest = document.getElementById("teamCrestSmall");
-  crest.textContent = state.club.tag;
-  crest.style.background = crestGradient(state.club);
-  document.getElementById("teamNameSmall").textContent = state.club.name;
-}
-function renderStandings() {
-  const rows = Object.entries(state.season.table).map(([name, t]) => ({ name, ...t, dg: t.gf - t.ga }));
-  rows.sort((a, b) => b.points - a.points || b.dg - a.dg || b.gf - a.gf);
-  document.getElementById("roundLabel").textContent = `Jornada ${Math.min(state.season.round + 1, state.season.fixtures.length)} / ${state.season.fixtures.length}`;
-  document.getElementById("standingsTable").innerHTML = `
-    <thead><tr class="text-gray-500 text-left"><th class="py-1 pr-1">#</th><th class="py-1 pr-1">Club</th><th class="py-1 px-1 text-center">PJ</th><th class="py-1 px-1 text-center">G</th><th class="py-1 px-1 text-center">E</th><th class="py-1 px-1 text-center">P</th><th class="py-1 px-1 text-center">DG</th><th class="py-1 pl-1 text-center">Pts</th></tr></thead>
-    <tbody>
-      ${rows.map((r, i) => `
-        <tr class="${r.name === state.club.name ? "bg-emerald-500/10" : ""} border-t border-white/5">
-          <td class="py-1.5 pr-1 text-gray-500">${i + 1}</td>
-          <td class="py-1.5 pr-1 font-semibold truncate max-w-[100px]">${r.name}</td>
-          <td class="py-1.5 px-1 text-center text-gray-400">${r.played}</td>
-          <td class="py-1.5 px-1 text-center text-gray-400">${r.wins}</td>
-          <td class="py-1.5 px-1 text-center text-gray-400">${r.draws}</td>
-          <td class="py-1.5 px-1 text-center text-gray-400">${r.losses}</td>
-          <td class="py-1.5 px-1 text-center text-gray-400">${r.dg > 0 ? "+" : ""}${r.dg}</td>
-          <td class="py-1.5 pl-1 text-center font-black text-emerald-400">${r.points}</td>
-        </tr>
-      `).join("")}
-    </tbody>
-  `;
-}
-function renderFixtures() {
-  document.getElementById("fixtureList").innerHTML = state.season.userFixtures.map(f => {
-    const right = f.played
-      ? `<span class="font-black text-sm ${f.gf > f.ga ? "text-emerald-400" : f.gf === f.ga ? "text-gray-400" : "text-red-400"}">${f.gf} - ${f.ga}</span>`
-      : `<span class="text-[10px] text-gray-500 font-semibold">Pendiente</span>`;
-    return `
-    <div class="card-sm p-3 flex items-center justify-between gap-2">
-      <div class="min-w-0">
-        <p class="text-[10px] text-gray-500 font-bold">Jornada ${f.round + 1} · ${f.home ? "Local" : "Visitante"}</p>
-        <p class="text-sm font-semibold truncate">${f.opponent}</p>
-      </div>
-      ${right}
-    </div>`;
-  }).join("");
-}
-function renderCalendar() {
-  renderMatchTeam();
-  const fixture = state.season.userFixtures.find(f => !f.played);
-  const playBtn = document.getElementById("playBtn");
-  if (fixture) {
-    const oppInfo = leagueClubs(state.club).find(c => c.name === fixture.opponent);
-    document.getElementById("rivalName").textContent = fixture.opponent;
-    const rivalCrest = document.getElementById("rivalCrest");
-    rivalCrest.textContent = oppInfo ? oppInfo.tag : "RIV";
-    rivalCrest.style.background = oppInfo ? crestGradient(oppInfo) : "#374151";
-    playBtn.disabled = false;
-    playBtn.classList.remove("opacity-40");
-    playBtn.innerHTML = `<i class="fa-solid fa-play"></i> Jugar Siguiente Partido (J${fixture.round + 1})`;
-  } else {
-    document.getElementById("rivalName").textContent = "—";
-    document.getElementById("rivalCrest").textContent = "—";
-    playBtn.disabled = true;
-    playBtn.classList.add("opacity-40");
-    playBtn.innerHTML = `<i class="fa-solid fa-trophy"></i> Temporada finalizada`;
+function simulateMatchQuick(userRating, oppRating) {
+  const mult = MENTALITY_MULT[state.tactics.mentality] || MENTALITY_MULT["Equilibrada"];
+  const diff = userRating - oppRating;
+  const gh = poissonGoals(Math.max(0.2, 1.2 + diff * 0.035) * mult.home);
+  const ga = poissonGoals(Math.max(0.2, 1.0 - diff * 0.035) * mult.away);
+  const events = [];
+  for (let i = 0; i < gh; i++) {
+    const isPenalty = Math.random() < 0.15 && state.tactics.penalty;
+    const scorer = isPenalty ? findPlayer(state.tactics.penalty) : pickWeightedAttacker();
+    events.push({ minute: 1 + Math.floor(Math.random() * 89), text: `⚽ Gol de ${scorer ? scorer.name : state.club.name}${isPenalty ? " (penalti)" : ""}.`, side: "home" });
   }
-  renderStandings();
-  renderFixtures();
+  for (let i = 0; i < ga; i++) events.push({ minute: 1 + Math.floor(Math.random() * 89), text: `Gol en contra.`, side: "away" });
+  if (Math.random() < 0.65) {
+    const carded = pickRandom(state.players);
+    events.push({ minute: 1 + Math.floor(Math.random() * 89), text: `🟨 Tarjeta amarilla para ${carded.name}.`, side: "home" });
+  }
+  events.sort((a, b) => a.minute - b.minute);
+  return { gh, ga, events };
 }
-
-const COMMENTARY_NEUTRAL = [
-  "Posesión tranquila en el centro del campo.",
-  "Falta cometida cerca del área.",
-  "Saque de banda para reanudar el juego.",
-  "Buen pase filtrado, pero se anticipa el defensor.",
-  "El árbitro reclama calma a los jugadores.",
-  "Tiro de esquina que no genera peligro.",
-  "Cambio de ritmo en el ataque, pero se pierde el balón.",
-  "Parada segura del portero a media altura."
-];
-const COMMENTARY_CHANCE = [
-  "¡Gran ocasión! El disparo se va rozando el poste.",
-  "Remate de cabeza que despeja el portero.",
-  "Jugada individual que termina en un disparo desviado.",
-  "Contraataque peligroso, pero el pase final no llega."
-];
-
-function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-
-function logMessage(minute, text, type) {
-  const log = document.getElementById("matchLog");
-  if (log.querySelector("p.italic")) log.innerHTML = "";
-  const colors = { goal: "text-emerald-400 font-bold", chance: "text-yellow-300", neutral: "text-gray-400" };
-  const div = document.createElement("p");
-  div.className = colors[type] || "text-gray-400";
-  div.innerHTML = `<span class="text-gray-600 font-mono">${minute}'</span> ${text}`;
-  log.appendChild(div);
-  log.scrollTop = log.scrollHeight;
-}
-
-function startMatch() {
-  if (state.matchTimer) return;
+function advanceToNextMatch() {
   const fixture = state.season.userFixtures.find(f => !f.played);
   if (!fixture) { alert("¡Temporada finalizada! No quedan partidos por jugar."); return; }
-  const oppInfo = leagueClubs(state.club).find(c => c.name === fixture.opponent);
-  state.rival = oppInfo || { name: fixture.opponent, tag: "RIV", rating: 75 };
+  const oppInfo = leagueClubs(state.club).find(c => c.name === fixture.opponent) || { name: fixture.opponent, tag: "RIV", rating: 75 };
   const rating = teamRating();
+  const { gh, ga, events } = simulateMatchQuick(rating, oppInfo.rating);
 
-  document.getElementById("rivalName").textContent = state.rival.name;
-  const rivalCrest = document.getElementById("rivalCrest");
-  rivalCrest.textContent = state.rival.tag;
-  rivalCrest.style.background = crestGradient(state.rival);
-  document.getElementById("scoreHome").textContent = "0";
-  document.getElementById("scoreAway").textContent = "0";
-  document.getElementById("matchLog").innerHTML = "";
-  document.getElementById("matchStatusLabel").textContent = "En directo";
-  document.getElementById("matchMinute").classList.remove("hidden");
-  document.getElementById("minuteNum").textContent = "0";
-  document.getElementById("playBtn").disabled = true;
-  document.getElementById("playBtn").classList.add("opacity-40");
-  document.getElementById("playBtn").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Partido en curso…`;
-
-  logMessage(0, `¡Comienza el partido (${fixture.home ? "Local" : "Visitante"}) contra ${state.rival.name}! Formación: ${state.tactics.formation} · ${state.tactics.mentality}.`, "neutral");
-
-  let minute = 0;
-  let scoreHome = 0, scoreAway = 0;
-  const mult = MENTALITY_MULT[state.tactics.mentality] || MENTALITY_MULT["Equilibrada"];
-  const diff = rating - state.rival.rating;
-  const homeChance = clamp((0.05 + diff * 0.002) * mult.home, 0.01, 0.18);
-  const awayChance = clamp((0.05 - diff * 0.002) * mult.away, 0.01, 0.18);
-
-  state.matchTimer = setInterval(() => {
-    minute++;
-    document.getElementById("minuteNum").textContent = minute;
-
-    const roll = Math.random();
-    if (roll < homeChance) {
-      scoreHome++;
-      document.getElementById("scoreHome").textContent = scoreHome;
-      const isPenalty = Math.random() < 0.15 && state.tactics.penalty;
-      const scorer = isPenalty ? findPlayer(state.tactics.penalty) : pickWeightedAttacker();
-      logMessage(minute, `⚽ ¡GOOOL! ${scorer ? scorer.name : state.club.name}${isPenalty ? " (de penalti)" : ""} pone el ${scoreHome}-${scoreAway}.`, "goal");
-    } else if (roll < homeChance + awayChance) {
-      scoreAway++;
-      document.getElementById("scoreAway").textContent = scoreAway;
-      logMessage(minute, `Gol de ${state.rival.name}. Se ponen ${scoreHome}-${scoreAway}.`, "goal");
-    } else if (roll < homeChance + awayChance + 0.015) {
-      const carded = pickRandom(state.players);
-      logMessage(minute, `🟨 Tarjeta amarilla para ${carded.name} (${state.club.name}).`, "neutral");
-    } else if (roll < homeChance + awayChance + 0.03) {
-      logMessage(minute, `🟨 Tarjeta amarilla para un jugador de ${state.rival.name}.`, "neutral");
-    } else if (roll < homeChance + awayChance + 0.03 + 0.12) {
-      logMessage(minute, pickRandom(COMMENTARY_CHANCE), "chance");
-    } else if (minute % 4 === 0) {
-      logMessage(minute, pickRandom(COMMENTARY_NEUTRAL), "neutral");
-    }
-
-    if (minute >= 90) {
-      clearInterval(state.matchTimer);
-      state.matchTimer = null;
-      finishMatch(scoreHome, scoreAway);
-    }
-  }, 220);
-}
-
-function finishMatch(home, away) {
-  document.getElementById("matchStatusLabel").textContent = "Partido finalizado";
-  document.getElementById("matchMinute").classList.add("hidden");
-
-  const fixture = state.season.userFixtures.find(f => !f.played);
-  fixture.played = true; fixture.gf = home; fixture.ga = away;
-  applyResult(state.club.name, home, away);
-  applyResult(fixture.opponent, away, home);
+  fixture.played = true; fixture.gf = gh; fixture.ga = ga;
+  applyResult(state.club.name, gh, ga);
+  applyResult(fixture.opponent, ga, gh);
   simulateRemainingRoundMatches(fixture.round);
   state.season.round = fixture.round + 1;
+  state.currentDate = addDays(state.season.startDate, fixture.round * 7);
 
-  let result, moneyDelta, moraleDelta;
-  if (home > away) {
-    result = "¡Victoria!"; moneyDelta = 2_000_000; moraleDelta = 10;
-  } else if (home === away) {
-    result = "Empate."; moneyDelta = 500_000; moraleDelta = 2;
-  } else {
-    result = "Derrota."; moneyDelta = 200_000; moraleDelta = -8;
-  }
+  let moneyDelta, moraleDelta, resultLabel;
+  if (gh > ga) { moneyDelta = 2_000_000; moraleDelta = 10; resultLabel = "Victoria"; }
+  else if (gh === ga) { moneyDelta = 500_000; moraleDelta = 2; resultLabel = "Empate"; }
+  else { moneyDelta = 200_000; moraleDelta = -8; resultLabel = "Derrota"; }
   state.money += moneyDelta;
   state.morale = clamp(state.morale + moraleDelta, 0, 100);
+  state.coins += 50;
 
-  logMessage(90, `Final del partido: ${state.club.name} ${home} - ${away} ${state.rival.name}. ${result}`, "goal");
-  logMessage(90, `Ingresos por taquilla: ${fmtMoney(moneyDelta)}. Moral del equipo: ${state.morale}%.`, "neutral");
-
-  renderTopBar();
-  renderCalendar();
+  addNews(`${resultLabel} ${gh}-${ga} ${fixture.home ? "vs" : "en casa de"} ${fixture.opponent}. Ingresos por taquilla: ${fmtMoney(moneyDelta)}.`);
+  showResultModal(fixture, oppInfo, gh, ga, events);
+  renderAllViews();
 }
-
-/* ============================================================
-   NAVEGACIÓN (pestañas dentro del modo carrera)
-   ============================================================ */
-function switchView(view) {
-  ["club", "squad", "tactics", "calendar", "office"].forEach(v => {
-    document.getElementById("view-" + v).classList.toggle("hidden", v !== view);
-  });
-  document.querySelectorAll(".tab-btn").forEach(btn => {
-    btn.classList.toggle("active", btn.dataset.view === view);
-  });
-  if (view === "tactics") renderTactics();
-  if (view === "calendar") { renderStandings(); renderFixtures(); }
-  if (view === "office") renderOffice();
+function showResultModal(fixture, oppInfo, gh, ga, events) {
+  document.getElementById("resultRound").textContent = `Jornada ${fixture.round + 1} · ${fixture.home ? "Local" : "Visitante"}`;
+  const crestHome = document.getElementById("resultCrestHome");
+  crestHome.textContent = state.club.tag; crestHome.style.background = crestGradient(state.club);
+  document.getElementById("resultNameHome").textContent = state.club.name;
+  const crestAway = document.getElementById("resultCrestAway");
+  crestAway.textContent = oppInfo.tag; crestAway.style.background = crestGradient(oppInfo);
+  document.getElementById("resultNameAway").textContent = fixture.opponent;
+  document.getElementById("resultGh").textContent = gh;
+  document.getElementById("resultGa").textContent = ga;
+  document.getElementById("resultEvents").innerHTML = events.length
+    ? events.map(e => `<p><span class="text-gray-600 font-mono">${e.minute}'</span> ${e.text}</p>`).join("")
+    : `<p class="text-gray-600 italic">Partido sin incidencias reseñables.</p>`;
+  document.getElementById("resultModal").classList.remove("hidden");
 }
-
-/* ============================================================
-   PANTALLAS PRINCIPALES (menú, nueva partida, cargar, carrera)
-   ============================================================ */
-let currentScreen = "menu";
-function showScreen(name) {
-  currentScreen = name;
-  document.getElementById("screen-menu").classList.toggle("hidden", name !== "menu");
-  document.getElementById("screen-newgame").classList.toggle("hidden", name !== "newgame");
-  document.getElementById("screen-load").classList.toggle("hidden", name !== "load");
-  document.getElementById("app").classList.toggle("hidden", name !== "app");
-}
-
-function toggleTopMenu() {
-  document.getElementById("topMenuDropdown").classList.toggle("hidden");
-}
-function closeTopMenu() {
-  document.getElementById("topMenuDropdown").classList.add("hidden");
-}
-document.addEventListener("click", (e) => {
-  const dropdown = document.getElementById("topMenuDropdown");
-  if (!dropdown || dropdown.classList.contains("hidden")) return;
-  if (!e.target.closest("#topMenuDropdown") && !e.target.closest("#topMenuBtn")) {
-    dropdown.classList.add("hidden");
-  }
-});
-function exitToMenu() {
-  closeTopMenu();
-  if (!confirm("¿Salir al menú principal? Los cambios no guardados se perderán.")) return;
-  if (state.matchTimer) { clearInterval(state.matchTimer); state.matchTimer = null; }
-  showScreen("menu");
-}
-function toast(msg) {
-  const el = document.createElement("div");
-  el.className = "fixed bottom-24 left-1/2 -translate-x-1/2 bg-emerald-500 text-black text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl z-50";
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), 2200);
-}
+function closeResultModal() { document.getElementById("resultModal").classList.add("hidden"); }
 
 /* ============================================================
-   GUARDADO (localStorage, 3 ranuras)
+   MODAL DE JUGADOR
    ============================================================ */
-function getSlotData(slot) {
-  try {
-    const raw = localStorage.getItem("fcm_slot_" + slot);
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    return null;
-  }
-}
-function writeSlot(slot, data) {
-  localStorage.setItem("fcm_slot_" + slot, JSON.stringify(data));
-}
-function deleteSlotData(slot) {
-  localStorage.removeItem("fcm_slot_" + slot);
-}
-function saveGame(silent) {
-  if (!state.saveSlot) {
-    if (!silent) alert("Esta partida no está asociada a ninguna ranura de guardado.");
-    return;
-  }
-  const data = {
-    savedAt: Date.now(),
-    club: state.club,
-    manager: state.manager,
-    money: state.money,
-    morale: state.morale,
-    players: state.players,
-    scoutReports: state.scoutReports,
-    tactics: state.tactics,
-    season: state.season,
-    teamRating: teamRating()
-  };
-  writeSlot(state.saveSlot, data);
-  if (!silent) {
-    closeTopMenu();
-    toast("Partida guardada en la ranura " + state.saveSlot + ".");
-  }
-}
-function restoreState(data, slot) {
-  state.club = data.club;
-  state.manager = data.manager;
-  state.money = data.money;
-  state.morale = data.morale;
-  state.players = data.players;
-  state.scoutReports = data.scoutReports || [];
-  state.tactics = data.tactics || { formation: "4-3-3", mentality: "Equilibrada", penalty: null, freekick: null, xi: [] };
-  state.season = data.season || buildSeason(data.club);
-  state.market = [];
-  state.saveSlot = slot;
-  renderAll();
-}
-function renderSlotCard(slot, mode) {
-  const data = getSlotData(slot);
-  if (!data) {
-    if (mode === "new") {
-      return `
-      <button onclick="confirmNewGameSlot(${slot})" class="w-full card p-4 flex items-center gap-3 text-left active:scale-[0.98] transition">
-        <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-500 shrink-0"><i class="fa-solid fa-plus"></i></div>
-        <div class="flex-1"><p class="font-bold text-sm">Ranura ${slot}</p><p class="text-xs text-gray-600">Vacía</p></div>
-      </button>`;
-    }
-    return `
-    <div class="w-full card p-4 flex items-center gap-3 opacity-40">
-      <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-600 shrink-0"><i class="fa-solid fa-lock"></i></div>
-      <div class="flex-1"><p class="font-bold text-sm text-gray-400">Ranura ${slot}</p><p class="text-xs text-gray-600">Vacía</p></div>
-    </div>`;
-  }
-  const dateStr = new Date(data.savedAt).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
-  const action = mode === "load" ? `loadFromSlot(${slot})` : `confirmNewGameSlot(${slot})`;
-  return `
-  <div class="w-full card p-3 flex items-center gap-3">
-    <button onclick="${action}" class="flex-1 flex items-center gap-3 text-left min-w-0">
-      <div class="w-12 h-12 rounded-xl flex items-center justify-center font-black text-xs shrink-0" style="background:${crestGradient(data.club)}">${data.club.tag}</div>
-      <div class="flex-1 min-w-0">
-        <p class="font-bold text-sm truncate">${data.club.name}</p>
-        <p class="text-[10px] text-gray-500 truncate">${data.club.league} · Ranura ${slot} · ${dateStr}</p>
-      </div>
-      <span class="text-sm font-black px-2 py-1 rounded shrink-0 ${ovrBadgeClass(data.teamRating)}">${data.teamRating}</span>
-    </button>
-    <button onclick="confirmDeleteSlot(${slot})" class="w-8 h-8 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-trash text-xs"></i></button>
-  </div>`;
-}
-function confirmDeleteSlot(slot) {
-  const data = getSlotData(slot);
-  if (!data) return;
-  if (!confirm(`¿Eliminar la partida guardada en la ranura ${slot} (${data.club.name})? Esta acción no se puede deshacer.`)) return;
-  deleteSlotData(slot);
-  if (currentScreen === "load") renderLoadSlots(); else renderNewGameSlots();
-}
+function openPlayerModal(id) {
+  const p = findPlayer(id);
+  if (!p) return;
+  state.currentModalPlayerId = id;
+  document.getElementById("modalName").textContent = p.name;
+  document.getElementById("modalAge").textContent = p.age;
+  document.getElementById("modalPrimaryPos").textContent = p.position;
+  document.getElementById("modalOtherPos").textContent = p.positions.slice(1).join(" ");
+  const ovrEl = document.getElementById("modalOvr");
+  ovrEl.textContent = p.ovr; ovrEl.className = "text-2xl font-black mt-0.5 " + statColor(p.ovr);
+  document.getElementById("modalHealth").textContent = p.health + "%";
+  const face = moraleFace(p.chemistry);
+  document.getElementById("modalMorale").innerHTML = `<i class="fa-solid ${face.icon} ${face.color}"></i>`;
+  document.getElementById("modalValue").textContent = fmtMoney(computeMarketValue(p) * 1_000_000);
+  document.getElementById("modalWage").textContent = fmtMoney(computeWage(p)) + "/sem";
+  document.getElementById("modalFoot").textContent = preferredFoot(p);
 
-/* ============================================================
-   CARGAR PARTIDA
-   ============================================================ */
-function openLoad() {
-  renderLoadSlots();
-  showScreen("load");
-}
-function renderLoadSlots() {
-  document.getElementById("loadSlots").innerHTML = [1, 2, 3].map(s => renderSlotCard(s, "load")).join("");
-}
-function loadFromSlot(slot) {
-  const data = getSlotData(slot);
-  if (!data) return;
-  restoreState(data, slot);
-  showScreen("app");
-  switchView("club");
-}
-
-/* ============================================================
-   NUEVA PARTIDA: PAÍS -> LIGA -> EQUIPO -> RANURA
-   ============================================================ */
-let newGame = { country: null, league: null, team: null };
-
-function openNewGame() {
-  newGame = { country: null, league: null, team: null };
-  renderNewGameCountries();
-  showScreen("newgame");
-}
-function newGameBack() {
-  if (newGame.team) { newGame.team = null; renderNewGameTeams(); }
-  else if (newGame.league) { newGame.league = null; renderNewGameLeagues(); }
-  else if (newGame.country) { newGame.country = null; renderNewGameCountries(); }
-  else showScreen("menu");
-}
-function renderNewGameCountries() {
-  document.getElementById("newGameStepLabel").textContent = "Paso 1 de 3";
-  document.getElementById("newGameTitle").textContent = "Elige un país";
-  document.getElementById("newGameList").innerHTML = Object.keys(COUNTRIES).map(name => `
-    <button onclick="selectCountry('${name}')" class="w-full card p-4 flex items-center gap-3 text-left active:scale-[0.98] transition">
-      <span class="text-2xl">${COUNTRIES[name].flag}</span>
-      <span class="flex-1 font-bold text-sm">${name}</span>
-      <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
-    </button>
+  const stats = computeSubStats(p);
+  const labels = { ritmo: "RIT", tiro: "TIR", pase: "PAS", regate: "REG", defensa: "DEF", fisico: "FÍS" };
+  document.getElementById("modalStats").innerHTML = Object.entries(stats).map(([k, v]) => `
+    <div><p class="text-[11px] text-gray-500 font-semibold">${labels[k]}</p><p class="text-xl font-black mt-0.5 ${statColor(v)}">${v}</p></div>
   `).join("");
-}
-function selectCountry(name) {
-  newGame.country = name;
-  renderNewGameLeagues();
-}
-function renderNewGameLeagues() {
-  document.getElementById("newGameStepLabel").textContent = "Paso 2 de 3";
-  document.getElementById("newGameTitle").textContent = "Elige una liga";
-  const leagues = Object.keys(COUNTRIES[newGame.country].leagues);
-  document.getElementById("newGameList").innerHTML = leagues.map(name => `
-    <button onclick="selectLeague('${name}')" class="w-full card p-4 flex items-center gap-3 text-left active:scale-[0.98] transition">
-      <div class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center text-emerald-400 shrink-0"><i class="fa-solid fa-trophy text-sm"></i></div>
-      <span class="flex-1 font-bold text-sm">${name}</span>
-      <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
-    </button>
+
+  const select = document.getElementById("modalPositionSelect");
+  select.innerHTML = Object.entries(POSITION_GROUPS).map(([group, positions]) => `
+    <optgroup label="${group}">${positions.map(pos => `<option value="${pos}" ${pos === p.position ? "selected" : ""}>${pos} — ${POSITION_LABELS[pos]}</option>`).join("")}</optgroup>
   `).join("");
+  document.getElementById("playerModal").classList.remove("hidden");
 }
-function selectLeague(name) {
-  newGame.league = name;
-  renderNewGameTeams();
-}
-function renderNewGameTeams() {
-  document.getElementById("newGameStepLabel").textContent = "Paso 3 de 3";
-  document.getElementById("newGameTitle").textContent = "Elige tu equipo";
-  const teams = COUNTRIES[newGame.country].leagues[newGame.league];
-  const note = `<p class="text-[10px] text-gray-500 px-1 pb-1">⭐ Plantilla con datos reales · el resto usa plantillas generadas</p>`;
-  document.getElementById("newGameList").innerHTML = note + teams.map((t, i) => `
-    <button onclick="selectTeam(${i})" class="w-full card p-3 flex items-center gap-3 text-left active:scale-[0.98] transition">
-      <div class="w-11 h-11 rounded-xl flex items-center justify-center font-black text-xs shrink-0" style="background:${crestGradient(t)}">${t.tag}</div>
-      <span class="flex-1 font-bold text-sm truncate">${t.name}${t.real ? " ⭐" : ""}</span>
-      <span class="text-sm font-black px-2 py-1 rounded shrink-0 ${ovrBadgeClass(t.rating)}">${t.rating}</span>
-    </button>
-  `).join("");
-}
-function selectTeam(i) {
-  newGame.team = COUNTRIES[newGame.country].leagues[newGame.league][i];
-  renderNewGameSlots();
-}
-function renderNewGameSlots() {
-  document.getElementById("newGameStepLabel").textContent = "Último paso";
-  document.getElementById("newGameTitle").textContent = "Elige una ranura para guardar";
-  document.getElementById("newGameList").innerHTML = [1, 2, 3].map(s => renderSlotCard(s, "new")).join("");
-}
-function confirmNewGameSlot(slot) {
-  const existing = getSlotData(slot);
-  if (existing && !confirm(`La ranura ${slot} ya tiene una partida (${existing.club.name}). ¿Sobrescribirla?`)) return;
-  startCareerFromNewGame(slot);
-}
-function startCareerFromNewGame(slot) {
-  const teamEntry = newGame.team;
-  const isReal = !!teamEntry.real;
-  const countryInfo = COUNTRIES[newGame.country];
-  const club = {
-    name: teamEntry.name, tag: teamEntry.tag, rating: teamEntry.rating,
-    country: newGame.country, countryFlag: countryInfo.flag, countryCode: countryInfo.code,
-    league: newGame.league
-  };
-  club.rival = pickRival(club);
-  club.stadiumName = isReal ? "Spotify Camp Nou" : "Estadio " + teamEntry.name;
-  club.stadiumCapacity = isReal ? 99354 : 20000 + teamEntry.rating * 600 + Math.floor(Math.random() * 8000);
-  club.kitColors = buildKitColors(club);
-
-  state.club = club;
-  state.players = isReal ? createBarcelonaSquad() : generateClubSquad(teamEntry.rating);
-  state.manager = isReal ? { name: "Hansi Flick", role: "Entrenador" } : { name: generateManagerName(), role: "Entrenador" };
-  state.money = Math.round(teamEntry.rating * 500_000 + 5_000_000);
-  state.morale = 78;
-  state.market = [];
-  state.scoutReports = [];
-  state.tactics = { formation: "4-3-3", mentality: "Equilibrada", penalty: null, freekick: null, xi: [] };
-  state.season = buildSeason(club);
-  state.saveSlot = slot;
-
-  saveGame(true);
-  renderAll();
-  showScreen("app");
-  switchView("club");
-}
-
-/* ============================================================
-   RENDER GLOBAL (tras cargar o empezar una carrera)
-   ============================================================ */
-function renderAll() {
-  renderTopBar();
-  renderClub();
-  renderSquad();
-  renderTactics();
-  renderCalendar();
-  renderOffice();
-  document.getElementById("matchLog").innerHTML = `<p class="text-gray-600 italic">Pulsa "Jugar Siguiente Partido" para simular el encuentro…</p>`;
-  document.getElementById("matchStatusLabel").textContent = "Listo para jugar";
-  document.getElementById("matchMinute").classList.add("hidden");
-  document.getElementById("scoreHome").textContent = "0";
-  document.getElementById("scoreAway").textContent = "0";
+function closePlayerModal() { document.getElementById("playerModal").classList.add("hidden"); state.currentModalPlayerId = null; }
+document.getElementById("playerModal").addEventListener("click", closePlayerModal);
+document.getElementById("resultModal").addEventListener("click", closeResultModal);
+function savePlayerPosition() {
+  const p = findPlayer(state.currentModalPlayerId);
+  if (!p) return;
+  const newPos = document.getElementById("modalPositionSelect").value;
+  p.position = newPos; p.positions = [newPos];
+  closePlayerModal();
+  renderSquadScreen();
 }
 
 /* ============================================================
    INIT
    ============================================================ */
-function init() {
-  showScreen("menu");
-}
+function init() { renderSelectScreen(); }
 init();
 </script>
 </body>
