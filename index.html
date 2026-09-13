@@ -26,21 +26,71 @@
 </head>
 <body class="bg-[#0f1015] text-white min-h-screen">
 
-<div id="app" class="max-w-md mx-auto min-h-screen relative pb-24">
+  <!-- ============ SCREEN: MAIN MENU ============ -->
+  <div id="screen-menu" class="max-w-md mx-auto min-h-screen flex flex-col items-center justify-center px-6 text-center gap-10 fade-in">
+    <div>
+      <div class="w-24 h-24 mx-auto rounded-3xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-2xl mb-5">
+        <i class="fa-solid fa-futbol text-4xl"></i>
+      </div>
+      <h1 class="text-3xl font-extrabold tracking-tight">FC MANAGER</h1>
+      <p class="text-sm text-gray-500 mt-1">Simulador de mánager de fútbol</p>
+    </div>
+    <div class="w-full space-y-3">
+      <button onclick="openNewGame()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm transition active:scale-[0.98]">
+        <i class="fa-solid fa-plus"></i> Nueva Partida
+      </button>
+      <button onclick="openLoad()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 font-bold py-4 rounded-2xl flex items-center justify-center gap-2 text-sm transition active:scale-[0.98]">
+        <i class="fa-solid fa-folder-open"></i> Cargar Partida
+      </button>
+    </div>
+    <p class="text-[10px] text-gray-600">Prototipo · Temporada 2025/26</p>
+  </div>
+
+  <!-- ============ SCREEN: NUEVA PARTIDA ============ -->
+  <div id="screen-newgame" class="hidden max-w-md mx-auto min-h-screen px-4 pb-8 fade-in">
+    <header class="sticky top-0 bg-[#0f1015]/95 backdrop-blur py-4 flex items-center gap-3 border-b border-white/5 -mx-4 px-4 mb-4 z-10">
+      <button onclick="newGameBack()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="fa-solid fa-arrow-left text-xs"></i></button>
+      <div class="min-w-0">
+        <p id="newGameStepLabel" class="text-[10px] text-gray-500 font-bold uppercase">Paso 1 de 3</p>
+        <h2 id="newGameTitle" class="font-bold text-base truncate">Elige un país</h2>
+      </div>
+    </header>
+    <div id="newGameList" class="space-y-2"></div>
+  </div>
+
+  <!-- ============ SCREEN: CARGAR PARTIDA ============ -->
+  <div id="screen-load" class="hidden max-w-md mx-auto min-h-screen px-4 pb-8 fade-in">
+    <header class="sticky top-0 bg-[#0f1015]/95 backdrop-blur py-4 flex items-center gap-3 border-b border-white/5 -mx-4 px-4 mb-4 z-10">
+      <button onclick="showScreen('menu')" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="fa-solid fa-arrow-left text-xs"></i></button>
+      <h2 class="font-bold text-base">Cargar Partida</h2>
+    </header>
+    <div id="loadSlots" class="space-y-3"></div>
+  </div>
+
+<div id="app" class="hidden max-w-md mx-auto min-h-screen relative pb-24">
 
   <!-- TOP BAR -->
   <header class="sticky top-0 z-30 bg-[#0f1015]/95 backdrop-blur border-b border-white/5">
     <div class="flex items-center justify-between px-4 py-3">
-      <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-700 via-red-700 to-yellow-500 flex items-center justify-center text-[11px] font-black shadow-lg">FCB</div>
-        <div>
-          <p class="font-bold text-sm leading-tight">FC Barcelona</p>
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div id="topClubCrest" class="w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-black shadow-lg shrink-0">FCB</div>
+        <div class="min-w-0">
+          <p id="topClubName" class="font-bold text-sm leading-tight truncate">FC Barcelona</p>
           <p class="text-[10px] text-gray-500 leading-tight">Temporada 2025/26</p>
         </div>
       </div>
-      <div class="flex items-center gap-3 text-xs font-semibold">
+      <div class="flex items-center gap-3 text-xs font-semibold shrink-0">
         <div class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-sack-dollar"></i><span id="topMoney">—</span></div>
         <div class="flex items-center gap-1 text-pink-400"><i class="fa-solid fa-heart"></i><span id="topMorale">—</span></div>
+        <div class="relative">
+          <button id="topMenuBtn" onclick="toggleTopMenu()" class="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-gray-300">
+            <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
+          </button>
+          <div id="topMenuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-[#1c1e26] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+            <button onclick="saveGame()" class="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-white/5 flex items-center gap-2"><i class="fa-solid fa-floppy-disk text-emerald-400"></i> Guardar partida</button>
+            <button onclick="exitToMenu()" class="w-full text-left px-4 py-3 text-xs font-semibold hover:bg-white/5 flex items-center gap-2 text-red-400"><i class="fa-solid fa-right-from-bracket"></i> Salir al menú</button>
+          </div>
+        </div>
       </div>
     </div>
   </header>
@@ -51,12 +101,12 @@
     <section id="view-club" class="fade-in space-y-4">
       <div class="card p-5 space-y-4">
         <div class="flex items-center gap-4">
-          <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-700 via-red-700 to-yellow-500 flex items-center justify-center text-xl font-black shadow-xl shrink-0">FCB</div>
-          <div class="flex-1">
-            <h1 class="text-xl font-extrabold">FC Barcelona</h1>
-            <p class="text-xs text-gray-400">La Liga EA Sports · España</p>
+          <div id="clubCrestBig" class="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black shadow-xl shrink-0">FCB</div>
+          <div class="flex-1 min-w-0">
+            <h1 id="clubNameBig" class="text-xl font-extrabold truncate">FC Barcelona</h1>
+            <p id="clubLeagueLine" class="text-xs text-gray-400 truncate">La Liga EA Sports · España</p>
           </div>
-          <div class="text-center">
+          <div class="text-center shrink-0">
             <div id="clubRatingBadge" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black">85</div>
             <p class="text-[10px] text-gray-500 mt-1">MEDIA</p>
           </div>
@@ -68,15 +118,15 @@
           </div>
           <div class="card-sm py-2.5">
             <p class="text-[10px] text-gray-500">Nación</p>
-            <p class="font-bold text-sm mt-0.5">🇪🇸 ESP</p>
+            <p id="statNation" class="font-bold text-sm mt-0.5">🇪🇸 ESP</p>
           </div>
           <div class="card-sm py-2.5">
             <p class="text-[10px] text-gray-500">Valor</p>
-            <p class="font-bold text-sm mt-0.5">685M€</p>
+            <p id="statValue" class="font-bold text-sm mt-0.5">685M€</p>
           </div>
           <div class="card-sm py-2.5">
             <p class="text-[10px] text-gray-500">Rival</p>
-            <p class="font-bold text-sm mt-0.5">R. Madrid</p>
+            <p id="statRival" class="font-bold text-sm mt-0.5">R. Madrid</p>
           </div>
         </div>
       </div>
@@ -90,15 +140,15 @@
         <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Equipaciones</p>
         <div class="grid grid-cols-3 gap-2">
           <div class="card-sm p-3 flex flex-col items-center gap-2">
-            <div class="w-full h-16 rounded-lg bg-gradient-to-b from-blue-800 via-red-700 to-blue-900 flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-white/90"></i></div>
+            <div id="kitHome" class="w-full h-16 rounded-lg flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-white/90"></i></div>
             <p class="text-[10px] text-gray-400 font-semibold">1ª Local</p>
           </div>
           <div class="card-sm p-3 flex flex-col items-center gap-2">
-            <div class="w-full h-16 rounded-lg bg-gradient-to-b from-amber-300 via-amber-400 to-yellow-500 flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-black/70"></i></div>
+            <div id="kitAway" class="w-full h-16 rounded-lg flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-black/70"></i></div>
             <p class="text-[10px] text-gray-400 font-semibold">2ª Visitante</p>
           </div>
           <div class="card-sm p-3 flex flex-col items-center gap-2">
-            <div class="w-full h-16 rounded-lg bg-gradient-to-b from-emerald-500 via-emerald-600 to-green-800 flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-black/70"></i></div>
+            <div id="kitGk" class="w-full h-16 rounded-lg flex items-center justify-center kit-shirt"><i class="fa-solid fa-shirt text-2xl text-black/70"></i></div>
             <p class="text-[10px] text-gray-400 font-semibold">Portero</p>
           </div>
         </div>
@@ -116,8 +166,8 @@
             <i class="fa-solid fa-futbol text-2xl text-emerald-400"></i>
           </div>
           <div class="flex-1">
-            <p class="font-bold text-sm">Spotify Camp Nou</p>
-            <p class="text-xs text-gray-500">Capacidad · 99.354 espectadores</p>
+            <p id="stadiumName" class="font-bold text-sm">Spotify Camp Nou</p>
+            <p id="stadiumCapacity" class="text-xs text-gray-500">Capacidad · 99.354 espectadores</p>
           </div>
           <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
         </div>
@@ -156,8 +206,8 @@
         </div>
         <div class="flex items-center justify-between mt-2">
           <div class="flex-1 text-center">
-            <div class="w-12 h-12 mx-auto rounded-xl bg-gradient-to-br from-blue-700 via-red-700 to-yellow-500 flex items-center justify-center text-[10px] font-black">FCB</div>
-            <p class="text-xs font-bold mt-1">Barcelona</p>
+            <div id="teamCrestSmall" class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black">FCB</div>
+            <p id="teamNameSmall" class="text-xs font-bold mt-1">Barcelona</p>
           </div>
           <div class="flex items-center gap-2 px-3">
             <span id="scoreHome" class="text-3xl font-black">0</span>
@@ -324,12 +374,8 @@ function makePlayer(spec) {
 
 /* Datos reales extraídos de la ficha de jugadores de FC Barcelona (GRL, edad,
    valor, salario, altura, peso, pie preferido, nación y stats RIT/TIR/PAS/REG/DEF/FÍS). */
-const state = {
-  money: 42_000_000,
-  morale: 78,
-  record: { played: 0, wins: 0, draws: 0, losses: 0, points: 0 },
-  manager: { name: "Hansi Flick", role: "Entrenador" },
-  players: [
+function createBarcelonaSquad() {
+  return [
     makePlayer({ name: "Joan García", positions: ["POR"], ovr: 86, age: 25, height: 193, weight: 85, value: 72.5, wage: 71000, foot: "Derecho", nation: { flag: "🇪🇸", country: "España" }, stats: { ritmo: 85, tiro: 85, pase: 80, regate: 88, defensa: 46, fisico: 84 } }),
     makePlayer({ name: "W. Szczęsny", positions: ["POR"], ovr: 81, age: 36, height: 195, weight: 90, value: 4.0, wage: 45000, foot: "Derecho", nation: { flag: "🇵🇱", country: "Polonia" }, stats: { ritmo: 78, tiro: 79, pase: 74, regate: 81, defensa: 36, fisico: 82 } }),
     makePlayer({ name: "Á. Yaakobishvili", positions: ["POR"], ovr: 70, age: 20, height: 187, weight: 78, value: 3.3, wage: 2000, foot: "Derecho", nation: { flag: "🇭🇺", country: "Hungría" }, stats: { ritmo: 69, tiro: 69, pase: 68, regate: 70, defensa: 35, fisico: 68 } }),
@@ -355,23 +401,74 @@ const state = {
     makePlayer({ name: "Ferran Torres", positions: ["DC", "EI", "MI"], ovr: 84, age: 26, height: 183, weight: 80, value: 53.5, wage: 130000, foot: "Derecho", nation: { flag: "🇪🇸", country: "España" }, stats: { ritmo: 88, tiro: 84, pase: 78, regate: 82, defensa: 40, fisico: 74 } }),
     makePlayer({ name: "Roony Bardghji", positions: ["ED", "MD"], ovr: 74, age: 20, height: 173, weight: 73, value: 9.0, wage: 46000, foot: "Izquierdo", nation: { flag: "🇸🇪", country: "Suecia" }, stats: { ritmo: 76, tiro: 71, pase: 70, regate: 78, defensa: 27, fisico: 58 } }),
     makePlayer({ name: "H. Abdelkarim", positions: ["DC"], ovr: 65, age: 18, height: 185, weight: 75, value: 0.775, wage: 2000, foot: "Izquierdo", nation: { flag: "🇪🇬", country: "Egipto" }, stats: { ritmo: 75, tiro: 62, pase: 52, regate: 63, defensa: 23, fisico: 69 } })
-  ],
+  ];
+}
+
+/* ============================================================
+   PAÍSES · LIGAS · EQUIPOS
+   ============================================================ */
+const COUNTRIES = {
+  "España": { flag: "🇪🇸", code: "ESP", leagues: { "LaLiga EA Sports": [
+    { name: "FC Barcelona", tag: "FCB", rating: 86, real: true },
+    { name: "Real Madrid CF", tag: "RMA", rating: 88 },
+    { name: "Atlético de Madrid", tag: "ATM", rating: 84 },
+    { name: "Athletic Club", tag: "ATH", rating: 80 },
+    { name: "Real Sociedad", tag: "RSO", rating: 81 },
+    { name: "Villarreal CF", tag: "VIL", rating: 79 },
+    { name: "Real Betis", tag: "BET", rating: 77 },
+    { name: "Sevilla FC", tag: "SEV", rating: 78 },
+    { name: "Valencia CF", tag: "VAL", rating: 76 },
+    { name: "RC Celta", tag: "CEL", rating: 74 }
+  ] } },
+  "Inglaterra": { flag: "🇬🇧", code: "ING", leagues: { "Premier League": [
+    { name: "Manchester City", tag: "MCI", rating: 89 },
+    { name: "Liverpool FC", tag: "LIV", rating: 87 },
+    { name: "Arsenal FC", tag: "ARS", rating: 86 },
+    { name: "Chelsea FC", tag: "CHE", rating: 82 },
+    { name: "Manchester United", tag: "MUN", rating: 81 },
+    { name: "Tottenham Hotspur", tag: "TOT", rating: 80 },
+    { name: "Newcastle United", tag: "NEW", rating: 79 },
+    { name: "Aston Villa", tag: "AVL", rating: 78 }
+  ] } },
+  "Italia": { flag: "🇮🇹", code: "ITA", leagues: { "Serie A": [
+    { name: "FC Inter de Milán", tag: "INT", rating: 86 },
+    { name: "Juventus FC", tag: "JUV", rating: 84 },
+    { name: "SSC Napoli", tag: "NAP", rating: 83 },
+    { name: "AC Milan", tag: "MIL", rating: 83 },
+    { name: "Atalanta BC", tag: "ATA", rating: 80 },
+    { name: "AS Roma", tag: "ROM", rating: 79 },
+    { name: "SS Lazio", tag: "LAZ", rating: 78 }
+  ] } },
+  "Alemania": { flag: "🇩🇪", code: "ALE", leagues: { "Bundesliga": [
+    { name: "Bayern de Múnich", tag: "BAY", rating: 88 },
+    { name: "Bayer Leverkusen", tag: "B04", rating: 84 },
+    { name: "Borussia Dortmund", tag: "BVB", rating: 83 },
+    { name: "RB Leipzig", tag: "RBL", rating: 82 },
+    { name: "VfB Stuttgart", tag: "VFB", rating: 78 },
+    { name: "Eintracht Frankfurt", tag: "SGE", rating: 77 }
+  ] } },
+  "Francia": { flag: "🇫🇷", code: "FRA", leagues: { "Ligue 1": [
+    { name: "Paris Saint-Germain", tag: "PSG", rating: 87 },
+    { name: "AS Mónaco", tag: "ASM", rating: 80 },
+    { name: "Olympique de Marsella", tag: "OM", rating: 79 },
+    { name: "Olympique de Lyon", tag: "OL", rating: 77 },
+    { name: "LOSC Lille", tag: "LIL", rating: 78 }
+  ] } }
+};
+
+const state = {
+  money: 42_000_000,
+  morale: 78,
+  record: { played: 0, wins: 0, draws: 0, losses: 0, points: 0 },
+  manager: { name: "Hansi Flick", role: "Entrenador" },
+  club: null,
+  players: [],
   market: [],
   currentModalPlayerId: null,
   rival: null,
-  matchTimer: null
+  matchTimer: null,
+  saveSlot: null
 };
-
-const RIVAL_POOL = [
-  { name: "Real Madrid CF", tag: "RMA", rating: 88 },
-  { name: "Atlético de Madrid", tag: "ATM", rating: 84 },
-  { name: "Sevilla FC", tag: "SEV", rating: 78 },
-  { name: "Valencia CF", tag: "VAL", rating: 76 },
-  { name: "Athletic Club", tag: "ATH", rating: 80 },
-  { name: "Villarreal CF", tag: "VIL", rating: 79 },
-  { name: "Real Sociedad", tag: "RSO", rating: 81 },
-  { name: "RC Celta", tag: "CEL", rating: 74 }
-];
 
 const MARKET_FIRST = ["Joan","Marc","Pau","Aleix","Nil","Roc","Guim","Ivo","Oriol","Bru","Toni","Adrià","Biel","Ferran","Dani","Kilian","Enric","Martí","Andreu","Jofre"];
 const MARKET_LAST = ["Vidal","Puig","Rovira","Camprodon","Solà","Bertran","Estany","Vinyes","Casanova","Ripoll","Montseny","Garriga","Bellver","Freixa","Coma"];
@@ -468,6 +565,71 @@ function avgOf(list) {
 function avgAge() {
   return (state.players.reduce((s, p) => s + p.age, 0) / state.players.length).toFixed(1);
 }
+function totalMarketValue() {
+  return state.players.reduce((s, p) => s + computeMarketValue(p), 0);
+}
+
+/* ============================================================
+   GENERACIÓN DE CLUB Y PLANTILLA (equipos que no son el FC Barcelona)
+   ============================================================ */
+function generateManagerName() {
+  return MARKET_FIRST[Math.floor(Math.random() * MARKET_FIRST.length)] + " " + MARKET_LAST[Math.floor(Math.random() * MARKET_LAST.length)];
+}
+function generateClubSquad(rating) {
+  const dist = [["POR", 3], ["DFC", 4], ["LI", 2], ["LD", 2], ["MCD", 2], ["MC", 3], ["MCO", 2], ["MI", 1], ["MD", 1], ["ED", 1], ["EI", 1], ["DC", 2]];
+  const usedNames = new Set();
+  const players = [];
+  dist.forEach(([pos, count]) => {
+    for (let i = 0; i < count; i++) {
+      let name;
+      do {
+        name = MARKET_FIRST[Math.floor(Math.random() * MARKET_FIRST.length)] + " " + MARKET_LAST[Math.floor(Math.random() * MARKET_LAST.length)];
+      } while (usedNames.has(name));
+      usedNames.add(name);
+      const age = 18 + Math.floor(Math.random() * 17);
+      const height = 170 + Math.floor(Math.random() * 25);
+      const weight = 65 + Math.floor(Math.random() * 22);
+      const ovr = clamp(rating + Math.floor(Math.random() * 16) - 9, 55, 94);
+      players.push(makePlayer({ name, positions: [pos], age, height, weight, ovr }));
+    }
+  });
+  return players;
+}
+function clubGradient(name) {
+  const h1 = hashStr(name) % 360;
+  const h2 = (h1 + 40) % 360;
+  return `linear-gradient(135deg, hsl(${h1},65%,40%), hsl(${h2},70%,28%))`;
+}
+function crestGradient(club) {
+  if (club.tag === "FCB") return "linear-gradient(135deg,#1d4ed8 0%,#b91c1c 55%,#eab308 100%)";
+  return clubGradient(club.name);
+}
+function buildKitColors(club) {
+  if (club.tag === "FCB") {
+    return {
+      home: "linear-gradient(180deg,#1e40af,#b91c1c,#1e3a8a)",
+      away: "linear-gradient(180deg,#fcd34d,#fbbf24,#eab308)"
+    };
+  }
+  const h = hashStr(club.name) % 360;
+  return {
+    home: `linear-gradient(180deg, hsl(${h},60%,35%), hsl(${(h + 20) % 360},55%,20%))`,
+    away: `linear-gradient(180deg, hsl(${(h + 150) % 360},70%,72%), hsl(${(h + 170) % 360},60%,52%))`
+  };
+}
+const KIT_GK_GRADIENT = "linear-gradient(180deg,#10b981,#059669,#065f46)";
+
+function leagueClubs(club) {
+  return COUNTRIES[club.country].leagues[club.league];
+}
+function pickRival(club) {
+  const others = leagueClubs(club).filter(c => c.name !== club.name);
+  if (!others.length) return "—";
+  return pickRandom(others).name;
+}
+function getLeagueRivalPool() {
+  return leagueClubs(state.club).filter(c => c.name !== state.club.name).map(c => ({ name: c.name, tag: c.tag, rating: c.rating }));
+}
 
 /* ============================================================
    RENDER: TOP BAR
@@ -475,17 +637,40 @@ function avgAge() {
 function renderTopBar() {
   document.getElementById("topMoney").textContent = fmtMoney(state.money);
   document.getElementById("topMorale").textContent = state.morale + "%";
+  if (!state.club) return;
+  const crest = document.getElementById("topClubCrest");
+  crest.textContent = state.club.tag;
+  crest.style.background = crestGradient(state.club);
+  document.getElementById("topClubName").textContent = state.club.name;
 }
 
 /* ============================================================
    RENDER: CLUB VIEW
    ============================================================ */
 function renderClub() {
+  if (!state.club) return;
   const rating = teamRating();
   const badge = document.getElementById("clubRatingBadge");
   badge.textContent = rating;
   badge.className = "w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black " + ovrBadgeClass(rating);
   document.getElementById("statAvgAge").textContent = avgAge() + " años";
+
+  const crestBig = document.getElementById("clubCrestBig");
+  crestBig.textContent = state.club.tag;
+  crestBig.style.background = crestGradient(state.club);
+  document.getElementById("clubNameBig").textContent = state.club.name;
+  document.getElementById("clubLeagueLine").textContent = state.club.league + " · " + state.club.country;
+  document.getElementById("statNation").textContent = state.club.countryFlag + " " + state.club.countryCode;
+  document.getElementById("statValue").textContent = fmtMoney(totalMarketValue() * 1_000_000);
+  document.getElementById("statRival").textContent = state.club.rival;
+
+  const kits = state.club.kitColors;
+  document.getElementById("kitHome").style.background = kits.home;
+  document.getElementById("kitAway").style.background = kits.away;
+  document.getElementById("kitGk").style.background = KIT_GK_GRADIENT;
+
+  document.getElementById("stadiumName").textContent = state.club.stadiumName;
+  document.getElementById("stadiumCapacity").textContent = "Capacidad · " + state.club.stadiumCapacity.toLocaleString("es-ES") + " espectadores";
 
   const best = [...state.players].sort((a, b) => b.ovr - a.ovr)[0];
   const bestU21 = [...state.players].filter(p => p.age <= 21).sort((a, b) => b.ovr - a.ovr)[0];
@@ -693,6 +878,13 @@ function renderMarket() {
 /* ============================================================
    SIMULADOR DE PARTIDO
    ============================================================ */
+function renderMatchTeam() {
+  if (!state.club) return;
+  const crest = document.getElementById("teamCrestSmall");
+  crest.textContent = state.club.tag;
+  crest.style.background = crestGradient(state.club);
+  document.getElementById("teamNameSmall").textContent = state.club.name;
+}
 function renderRecord() {
   const r = state.record;
   const items = [
@@ -739,7 +931,7 @@ function logMessage(minute, text, type) {
 
 function startMatch() {
   if (state.matchTimer) return;
-  state.rival = pickRandom(RIVAL_POOL);
+  state.rival = pickRandom(getLeagueRivalPool());
   const rating = teamRating();
 
   document.getElementById("rivalName").textContent = state.rival.name;
@@ -770,7 +962,7 @@ function startMatch() {
     if (roll < homeChance) {
       scoreHome++;
       document.getElementById("scoreHome").textContent = scoreHome;
-      logMessage(minute, `¡GOL del Barcelona! El marcador se mueve.`, "goal");
+      logMessage(minute, `¡GOL del ${state.club.name}! El marcador se mueve.`, "goal");
     } else if (roll < homeChance + awayChance) {
       scoreAway++;
       document.getElementById("scoreAway").textContent = scoreAway;
@@ -811,7 +1003,7 @@ function finishMatch(home, away) {
   state.money += moneyDelta;
   state.morale = clamp(state.morale + moraleDelta, 0, 100);
 
-  logMessage(90, `Final del partido: Barcelona ${home} - ${away} ${state.rival.name}. ${result}`, "goal");
+  logMessage(90, `Final del partido: ${state.club.name} ${home} - ${away} ${state.rival.name}. ${result}`, "goal");
   logMessage(90, `Ingresos por taquilla: ${fmtMoney(moneyDelta)}. Moral del equipo: ${state.morale}%.`, "neutral");
 
   renderTopBar();
@@ -819,7 +1011,7 @@ function finishMatch(home, away) {
 }
 
 /* ============================================================
-   NAVEGACIÓN
+   NAVEGACIÓN (pestañas dentro del modo carrera)
    ============================================================ */
 function switchView(view) {
   ["club", "squad", "match", "market"].forEach(v => {
@@ -832,14 +1024,277 @@ function switchView(view) {
 }
 
 /* ============================================================
-   INIT
+   PANTALLAS PRINCIPALES (menú, nueva partida, cargar, carrera)
    ============================================================ */
-function init() {
+let currentScreen = "menu";
+function showScreen(name) {
+  currentScreen = name;
+  document.getElementById("screen-menu").classList.toggle("hidden", name !== "menu");
+  document.getElementById("screen-newgame").classList.toggle("hidden", name !== "newgame");
+  document.getElementById("screen-load").classList.toggle("hidden", name !== "load");
+  document.getElementById("app").classList.toggle("hidden", name !== "app");
+}
+
+function toggleTopMenu() {
+  document.getElementById("topMenuDropdown").classList.toggle("hidden");
+}
+function closeTopMenu() {
+  document.getElementById("topMenuDropdown").classList.add("hidden");
+}
+document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("topMenuDropdown");
+  if (!dropdown || dropdown.classList.contains("hidden")) return;
+  if (!e.target.closest("#topMenuDropdown") && !e.target.closest("#topMenuBtn")) {
+    dropdown.classList.add("hidden");
+  }
+});
+function exitToMenu() {
+  closeTopMenu();
+  if (!confirm("¿Salir al menú principal? Los cambios no guardados se perderán.")) return;
+  if (state.matchTimer) { clearInterval(state.matchTimer); state.matchTimer = null; }
+  showScreen("menu");
+}
+function toast(msg) {
+  const el = document.createElement("div");
+  el.className = "fixed bottom-24 left-1/2 -translate-x-1/2 bg-emerald-500 text-black text-xs font-bold px-4 py-2.5 rounded-full shadow-2xl z-50";
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 2200);
+}
+
+/* ============================================================
+   GUARDADO (localStorage, 3 ranuras)
+   ============================================================ */
+function getSlotData(slot) {
+  try {
+    const raw = localStorage.getItem("fcm_slot_" + slot);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+function writeSlot(slot, data) {
+  localStorage.setItem("fcm_slot_" + slot, JSON.stringify(data));
+}
+function deleteSlotData(slot) {
+  localStorage.removeItem("fcm_slot_" + slot);
+}
+function saveGame(silent) {
+  if (!state.saveSlot) {
+    if (!silent) alert("Esta partida no está asociada a ninguna ranura de guardado.");
+    return;
+  }
+  const data = {
+    savedAt: Date.now(),
+    club: state.club,
+    manager: state.manager,
+    money: state.money,
+    morale: state.morale,
+    record: state.record,
+    players: state.players,
+    teamRating: teamRating()
+  };
+  writeSlot(state.saveSlot, data);
+  if (!silent) {
+    closeTopMenu();
+    toast("Partida guardada en la ranura " + state.saveSlot + ".");
+  }
+}
+function restoreState(data, slot) {
+  state.club = data.club;
+  state.manager = data.manager;
+  state.money = data.money;
+  state.morale = data.morale;
+  state.record = data.record;
+  state.players = data.players;
+  state.market = [];
+  state.saveSlot = slot;
+  renderAll();
+}
+function renderSlotCard(slot, mode) {
+  const data = getSlotData(slot);
+  if (!data) {
+    if (mode === "new") {
+      return `
+      <button onclick="confirmNewGameSlot(${slot})" class="w-full card p-4 flex items-center gap-3 text-left active:scale-[0.98] transition">
+        <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-500 shrink-0"><i class="fa-solid fa-plus"></i></div>
+        <div class="flex-1"><p class="font-bold text-sm">Ranura ${slot}</p><p class="text-xs text-gray-600">Vacía</p></div>
+      </button>`;
+    }
+    return `
+    <div class="w-full card p-4 flex items-center gap-3 opacity-40">
+      <div class="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-gray-600 shrink-0"><i class="fa-solid fa-lock"></i></div>
+      <div class="flex-1"><p class="font-bold text-sm text-gray-400">Ranura ${slot}</p><p class="text-xs text-gray-600">Vacía</p></div>
+    </div>`;
+  }
+  const dateStr = new Date(data.savedAt).toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const action = mode === "load" ? `loadFromSlot(${slot})` : `confirmNewGameSlot(${slot})`;
+  return `
+  <div class="w-full card p-3 flex items-center gap-3">
+    <button onclick="${action}" class="flex-1 flex items-center gap-3 text-left min-w-0">
+      <div class="w-12 h-12 rounded-xl flex items-center justify-center font-black text-xs shrink-0" style="background:${crestGradient(data.club)}">${data.club.tag}</div>
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-sm truncate">${data.club.name}</p>
+        <p class="text-[10px] text-gray-500 truncate">${data.club.league} · Ranura ${slot} · ${dateStr}</p>
+      </div>
+      <span class="text-sm font-black px-2 py-1 rounded shrink-0 ${ovrBadgeClass(data.teamRating)}">${data.teamRating}</span>
+    </button>
+    <button onclick="confirmDeleteSlot(${slot})" class="w-8 h-8 rounded-full bg-red-500/10 text-red-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-trash text-xs"></i></button>
+  </div>`;
+}
+function confirmDeleteSlot(slot) {
+  const data = getSlotData(slot);
+  if (!data) return;
+  if (!confirm(`¿Eliminar la partida guardada en la ranura ${slot} (${data.club.name})? Esta acción no se puede deshacer.`)) return;
+  deleteSlotData(slot);
+  if (currentScreen === "load") renderLoadSlots(); else renderNewGameSlots();
+}
+
+/* ============================================================
+   CARGAR PARTIDA
+   ============================================================ */
+function openLoad() {
+  renderLoadSlots();
+  showScreen("load");
+}
+function renderLoadSlots() {
+  document.getElementById("loadSlots").innerHTML = [1, 2, 3].map(s => renderSlotCard(s, "load")).join("");
+}
+function loadFromSlot(slot) {
+  const data = getSlotData(slot);
+  if (!data) return;
+  restoreState(data, slot);
+  showScreen("app");
+  switchView("club");
+}
+
+/* ============================================================
+   NUEVA PARTIDA: PAÍS -> LIGA -> EQUIPO -> RANURA
+   ============================================================ */
+let newGame = { country: null, league: null, team: null };
+
+function openNewGame() {
+  newGame = { country: null, league: null, team: null };
+  renderNewGameCountries();
+  showScreen("newgame");
+}
+function newGameBack() {
+  if (newGame.team) { newGame.team = null; renderNewGameTeams(); }
+  else if (newGame.league) { newGame.league = null; renderNewGameLeagues(); }
+  else if (newGame.country) { newGame.country = null; renderNewGameCountries(); }
+  else showScreen("menu");
+}
+function renderNewGameCountries() {
+  document.getElementById("newGameStepLabel").textContent = "Paso 1 de 3";
+  document.getElementById("newGameTitle").textContent = "Elige un país";
+  document.getElementById("newGameList").innerHTML = Object.keys(COUNTRIES).map(name => `
+    <button onclick="selectCountry('${name}')" class="w-full card p-4 flex items-center gap-3 text-left active:scale-[0.98] transition">
+      <span class="text-2xl">${COUNTRIES[name].flag}</span>
+      <span class="flex-1 font-bold text-sm">${name}</span>
+      <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
+    </button>
+  `).join("");
+}
+function selectCountry(name) {
+  newGame.country = name;
+  renderNewGameLeagues();
+}
+function renderNewGameLeagues() {
+  document.getElementById("newGameStepLabel").textContent = "Paso 2 de 3";
+  document.getElementById("newGameTitle").textContent = "Elige una liga";
+  const leagues = Object.keys(COUNTRIES[newGame.country].leagues);
+  document.getElementById("newGameList").innerHTML = leagues.map(name => `
+    <button onclick="selectLeague('${name}')" class="w-full card p-4 flex items-center gap-3 text-left active:scale-[0.98] transition">
+      <div class="w-9 h-9 rounded-lg bg-white/5 flex items-center justify-center text-emerald-400 shrink-0"><i class="fa-solid fa-trophy text-sm"></i></div>
+      <span class="flex-1 font-bold text-sm">${name}</span>
+      <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
+    </button>
+  `).join("");
+}
+function selectLeague(name) {
+  newGame.league = name;
+  renderNewGameTeams();
+}
+function renderNewGameTeams() {
+  document.getElementById("newGameStepLabel").textContent = "Paso 3 de 3";
+  document.getElementById("newGameTitle").textContent = "Elige tu equipo";
+  const teams = COUNTRIES[newGame.country].leagues[newGame.league];
+  const note = `<p class="text-[10px] text-gray-500 px-1 pb-1">⭐ Plantilla con datos reales · el resto usa plantillas generadas</p>`;
+  document.getElementById("newGameList").innerHTML = note + teams.map((t, i) => `
+    <button onclick="selectTeam(${i})" class="w-full card p-3 flex items-center gap-3 text-left active:scale-[0.98] transition">
+      <div class="w-11 h-11 rounded-xl flex items-center justify-center font-black text-xs shrink-0" style="background:${crestGradient(t)}">${t.tag}</div>
+      <span class="flex-1 font-bold text-sm truncate">${t.name}${t.real ? " ⭐" : ""}</span>
+      <span class="text-sm font-black px-2 py-1 rounded shrink-0 ${ovrBadgeClass(t.rating)}">${t.rating}</span>
+    </button>
+  `).join("");
+}
+function selectTeam(i) {
+  newGame.team = COUNTRIES[newGame.country].leagues[newGame.league][i];
+  renderNewGameSlots();
+}
+function renderNewGameSlots() {
+  document.getElementById("newGameStepLabel").textContent = "Último paso";
+  document.getElementById("newGameTitle").textContent = "Elige una ranura para guardar";
+  document.getElementById("newGameList").innerHTML = [1, 2, 3].map(s => renderSlotCard(s, "new")).join("");
+}
+function confirmNewGameSlot(slot) {
+  const existing = getSlotData(slot);
+  if (existing && !confirm(`La ranura ${slot} ya tiene una partida (${existing.club.name}). ¿Sobrescribirla?`)) return;
+  startCareerFromNewGame(slot);
+}
+function startCareerFromNewGame(slot) {
+  const teamEntry = newGame.team;
+  const isReal = !!teamEntry.real;
+  const countryInfo = COUNTRIES[newGame.country];
+  const club = {
+    name: teamEntry.name, tag: teamEntry.tag, rating: teamEntry.rating,
+    country: newGame.country, countryFlag: countryInfo.flag, countryCode: countryInfo.code,
+    league: newGame.league
+  };
+  club.rival = pickRival(club);
+  club.stadiumName = isReal ? "Spotify Camp Nou" : "Estadio " + teamEntry.name;
+  club.stadiumCapacity = isReal ? 99354 : 20000 + teamEntry.rating * 600 + Math.floor(Math.random() * 8000);
+  club.kitColors = buildKitColors(club);
+
+  state.club = club;
+  state.players = isReal ? createBarcelonaSquad() : generateClubSquad(teamEntry.rating);
+  state.manager = isReal ? { name: "Hansi Flick", role: "Entrenador" } : { name: generateManagerName(), role: "Entrenador" };
+  state.money = Math.round(teamEntry.rating * 500_000 + 5_000_000);
+  state.morale = 78;
+  state.record = { played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
+  state.market = [];
+  state.saveSlot = slot;
+
+  saveGame(true);
+  renderAll();
+  showScreen("app");
+  switchView("club");
+}
+
+/* ============================================================
+   RENDER GLOBAL (tras cargar o empezar una carrera)
+   ============================================================ */
+function renderAll() {
   renderTopBar();
   renderClub();
   renderSquad();
   renderRecord();
-  refreshMarket();
+  renderMatchTeam();
+  document.getElementById("matchLog").innerHTML = `<p class="text-gray-600 italic">Pulsa "Jugar Partido" para simular el encuentro…</p>`;
+  document.getElementById("matchStatusLabel").textContent = "Listo para jugar";
+  document.getElementById("matchMinute").classList.add("hidden");
+  document.getElementById("scoreHome").textContent = "0";
+  document.getElementById("scoreAway").textContent = "0";
+  document.getElementById("playBtn").disabled = false;
+  document.getElementById("playBtn").classList.remove("opacity-40");
+  document.getElementById("playBtn").innerHTML = `<i class="fa-solid fa-play"></i> Jugar Partido`;
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init() {
+  showScreen("menu");
 }
 init();
 </script>
