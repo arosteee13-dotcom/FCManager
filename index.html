@@ -142,7 +142,7 @@
           </div>
         </div>
       </div>
-      <div id="squadGrid" class="grid grid-cols-2 gap-3"></div>
+      <div id="squadGrid" class="flex flex-col gap-2.5"></div>
     </section>
 
     <!-- ============ VIEW: MATCH ============ -->
@@ -414,6 +414,20 @@ function positionCategory(pos) {
 }
 function findPlayer(id) { return state.players.find(p => p.id === id); }
 
+const NATIONS = {
+  "W. Szczęsny": { flag: "🇵🇱", country: "Polonia" },
+  "Jules Koundé": { flag: "🇫🇷", country: "Francia" },
+  "Ronald Araujo": { flag: "🇺🇾", country: "Uruguay" },
+  "A. Christensen": { flag: "🇩🇰", country: "Dinamarca" },
+  "F. de Jong": { flag: "🇳🇱", country: "Países Bajos" },
+  "Karim Adeyemi": { flag: "🇩🇪", country: "Alemania" },
+  "Anthony Gordon": { flag: "🏴󠁧󠁢󠁥󠁮󠁧󠁿", country: "Inglaterra" },
+  "Raphinha": { flag: "🇧🇷", country: "Brasil" },
+  "Roony Bardghji": { flag: "🇸🇪", country: "Suecia" }
+};
+function nationOf(player) {
+  return NATIONS[player.name] || { flag: "🇪🇸", country: "España" };
+}
 const KNOWN_FEET = {
   "Balde": "Izquierdo", "Gerard Martín": "Izquierdo", "Raphinha": "Izquierdo",
   "Lamine Yamal": "Izquierdo", "Anthony Gordon": "Izquierdo", "Jofre Torrents": "Izquierdo",
@@ -539,22 +553,40 @@ function renderSquad() {
   document.getElementById("squadAvgOvr").textContent = avgOf(state.players);
 
   const sorted = [...state.players].sort((a, b) => b.ovr - a.ovr);
-  document.getElementById("squadGrid").innerHTML = sorted.map(p => `
-    <button onclick="openPlayerModal('${p.id}')" class="card p-3 text-left flex flex-col gap-2 active:scale-[0.98] transition">
-      <div class="flex items-start justify-between">
-        <div class="w-12 h-12 rounded-full flex items-center justify-center font-black text-sm" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
-        <span class="text-[11px] font-black px-1.5 py-0.5 rounded ${ovrBadgeClass(p.ovr)}">${p.ovr}</span>
+  document.getElementById("squadGrid").innerHTML = sorted.map(p => {
+    const potential = computePotential(p);
+    const nation = nationOf(p);
+    return `
+    <button onclick="openPlayerModal('${p.id}')" class="card p-3 flex items-center gap-3 text-left active:scale-[0.98] transition">
+      <div class="w-14 h-14 rounded-xl bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center shrink-0">
+        <i class="fa-solid fa-user text-2xl text-slate-500"></i>
       </div>
-      <div>
-        <p class="font-bold text-xs leading-tight truncate">${p.name}</p>
-        <p class="text-[10px] text-gray-500 font-semibold">${p.positions.join(" · ")} · ${p.age} años</p>
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-sm truncate">${p.name}</p>
+        <p class="text-xs font-semibold mt-0.5">
+          <span class="text-emerald-400">${p.position}</span>
+          <span class="text-gray-500">${p.positions.length > 1 ? " " + p.positions.slice(1).join(" ") : ""}</span>
+        </p>
+        <p class="text-xs text-gray-400 font-semibold mt-1">${fmtMoney(computeMarketValue(p) * 1_000_000)} · ${fmtMoney(computeWage(p))}</p>
       </div>
-      <div class="flex gap-2 text-[9px] text-gray-500 border-t border-white/5 pt-1.5">
-        <span><i class="fa-solid fa-ruler-vertical mr-0.5"></i>${p.height}cm</span>
-        <span><i class="fa-solid fa-weight-scale mr-0.5"></i>${p.weight}kg</span>
+      <div class="flex flex-col items-end gap-1.5 shrink-0">
+        <div class="flex items-start gap-2.5">
+          <div class="text-center">
+            <p class="text-xl font-black leading-none ${statColor(p.ovr)}">${p.ovr}</p>
+            <p class="text-[8px] text-gray-500 font-bold mt-1">GRL</p>
+          </div>
+          <div class="text-center">
+            <p class="text-xl font-black leading-none ${potential !== null ? statColor(potential) : "text-gray-600"}">${potential !== null ? potential : "-"}</p>
+            <p class="text-[8px] text-gray-500 font-bold mt-1">POT</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1 text-[11px] text-gray-300 font-semibold">
+          <span>${nation.flag}</span><span>${nation.country}</span>
+        </div>
       </div>
     </button>
-  `).join("");
+  `;
+  }).join("");
 }
 
 /* ============================================================
