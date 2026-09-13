@@ -275,38 +275,49 @@ const POSITION_LABELS = {
   ED: "Extremo derecho", EI: "Extremo izquierdo", SD: "Segundo delantero", DC: "Delantero centro"
 };
 
-function makePlayer(name, position, age, height, weight, ovr) {
-  return { id: name.toLowerCase().replace(/\s+/g, "-") + "-" + age, name, position, age, height, weight, ovr };
+function makePlayer(name, positions, age, height, weight, ovr) {
+  const posList = Array.isArray(positions) ? positions : [positions];
+  return { id: name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + "-" + age, name, positions: posList, position: posList[0], age, height, weight, ovr };
 }
 
 const state = {
   money: 42_000_000,
   morale: 78,
   record: { played: 0, wins: 0, draws: 0, losses: 0, points: 0 },
-  manager: { name: "Marc Ibáñez", role: "Entrenador" },
+  manager: { name: "Hansi Flick", role: "Entrenador" },
   players: [
-    makePlayer("Iker Balde", "POR", 24, 187, 82, 84),
-    makePlayer("Nil Casals", "POR", 32, 190, 85, 79),
-    makePlayer("Pau Serrat", "POR", 19, 185, 78, 68),
-    makePlayer("Dídac Fontàs", "DFC", 27, 189, 84, 85),
-    makePlayer("Bruno Alerm", "DFC", 25, 186, 81, 82),
-    makePlayer("Marc Puigverd", "DFC", 33, 184, 80, 78),
-    makePlayer("Xavi Montcada", "LI", 23, 178, 72, 83),
-    makePlayer("Aleix Riera", "LD", 22, 176, 70, 80),
-    makePlayer("Toni Sagrera", "LD", 30, 180, 75, 76),
-    makePlayer("Gerard Falgueres", "MCD", 26, 183, 76, 86),
-    makePlayer("Pol Cerdanya", "MC", 21, 175, 68, 84),
-    makePlayer("Adrià Montjuïc", "MC", 29, 178, 74, 81),
-    makePlayer("Biel Garrotxa", "MCO", 24, 174, 69, 87),
-    makePlayer("Oriol Bages", "MI", 20, 172, 65, 79),
-    makePlayer("Ivo Cardona", "MD", 28, 177, 73, 77),
-    makePlayer("Nico Vallès", "ED", 22, 178, 74, 88),
-    makePlayer("Rai Empúries", "EI", 19, 176, 70, 85),
-    makePlayer("Kike Osona", "DC", 26, 185, 80, 89),
-    makePlayer("Dani Bergueda", "DC", 31, 182, 78, 80),
-    makePlayer("Ferran Solsona", "SD", 23, 180, 76, 78),
-    makePlayer("Guim Anoia", "ED", 34, 179, 75, 75),
-    makePlayer("Roc Priorat", "EI", 21, 175, 71, 82)
+    makePlayer("Joan García", ["POR"], 25, 193, 85, 82),
+    makePlayer("W. Szczęsny", ["POR"], 36, 195, 90, 86),
+    makePlayer("Á. Yaakobishvili", ["POR"], 20, 187, 78, 68),
+    makePlayer("Pau Cubarsí", ["DFC"], 19, 183, 79, 82),
+    makePlayer("Eric García", ["DFC", "LD", "MCD"], 25, 183, 76, 81),
+    makePlayer("Balde", ["LI", "MI"], 22, 175, 69, 82),
+    makePlayer("Gerard Martín", ["DFC", "LI", "MI"], 24, 186, 76, 79),
+    makePlayer("Jules Koundé", ["LD", "DFC", "MD"], 27, 181, 84, 85),
+    makePlayer("Ronald Araujo", ["DFC", "LD"], 27, 188, 79, 80),
+    makePlayer("A. Christensen", ["DFC", "MC", "MCD"], 30, 189, 82, 79),
+    makePlayer("Héctor Fort", ["LD", "LI", "MD"], 20, 185, 78, 72),
+    makePlayer("Xavi Espart", ["LD", "MCD", "MC"], 19, 175, 65, 67),
+    makePlayer("Álvaro Cortés", ["DFC"], 21, 190, 78, 66),
+    makePlayer("Jofre Torrents", ["LI"], 19, 185, 75, 64),
+    makePlayer("Pedri", ["MC", "MCD", "MCO"], 23, 174, 60, 90),
+    makePlayer("F. de Jong", ["MC", "MCD", "MCO"], 29, 181, 74, 86),
+    makePlayer("Fermín", ["MCO", "MC", "MI"], 23, 174, 64, 85),
+    makePlayer("Dani Olmo", ["MCO", "MC", "MI"], 28, 179, 72, 84),
+    makePlayer("Gavi", ["MC", "MCD", "MI"], 22, 173, 70, 83),
+    makePlayer("Karim Adeyemi", ["MD", "EI", "MCO"], 24, 180, 77, 82),
+    makePlayer("Marc Casadó", ["MCD", "MC"], 22, 171, 65, 78),
+    makePlayer("Marc Bernal", ["MCD", "MC"], 19, 193, 84, 78),
+    makePlayer("G. Fernández", ["MC", "MCO"], 18, 181, 76, 64),
+    makePlayer("Tommy Marqués", ["MCD", "MC"], 19, 186, 73, 63),
+    makePlayer("Lamine Yamal", ["ED", "MD"], 19, 181, 72, 90),
+    makePlayer("Anthony Gordon", ["EI", "DC", "MI"], 25, 183, 72, 81),
+    makePlayer("Raphinha", ["EI", "ED", "MCO"], 29, 176, 68, 88),
+    makePlayer("Ferran Torres", ["DC", "EI", "MI"], 26, 183, 80, 84),
+    makePlayer("Roony Bardghji", ["ED", "MD"], 20, 173, 73, 74),
+    makePlayer("J. Bisiwu", ["EI", "ED", "DC"], 18, 179, 74, 67),
+    makePlayer("Toni Fernández", ["ED", "MD"], 18, 174, 73, 65),
+    makePlayer("H. Abdelkarim", ["DC"], 18, 185, 75, 65)
   ],
   market: [],
   currentModalPlayerId: null,
@@ -465,7 +476,7 @@ function renderSquad() {
       </div>
       <div>
         <p class="font-bold text-xs leading-tight truncate">${p.name}</p>
-        <p class="text-[10px] text-gray-500 font-semibold">${p.position} · ${p.age} años</p>
+        <p class="text-[10px] text-gray-500 font-semibold">${p.positions.join(" · ")} · ${p.age} años</p>
       </div>
       <div class="flex gap-2 text-[9px] text-gray-500 border-t border-white/5 pt-1.5">
         <span><i class="fa-solid fa-ruler-vertical mr-0.5"></i>${p.height}cm</span>
@@ -486,7 +497,8 @@ function openPlayerModal(id) {
   document.getElementById("modalAvatar").style.background = avatarColor(p.name);
   document.getElementById("modalAvatar").textContent = initials(p.name);
   document.getElementById("modalName").textContent = p.name;
-  document.getElementById("modalSub").textContent = POSITION_LABELS[p.position];
+  document.getElementById("modalSub").textContent = POSITION_LABELS[p.position] +
+    (p.positions.length > 1 ? " · también: " + p.positions.slice(1).join(", ") : "");
   document.getElementById("modalAge").textContent = p.age;
   document.getElementById("modalHeight").textContent = p.height + " cm";
   document.getElementById("modalWeight").textContent = p.weight + " kg";
@@ -528,6 +540,7 @@ function savePlayerPosition() {
   if (!p) return;
   const newPos = document.getElementById("modalPositionSelect").value;
   p.position = newPos;
+  p.positions = [newPos];
   closePlayerModal();
   renderSquad();
   renderClub();
