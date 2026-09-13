@@ -15,13 +15,15 @@
   .card-sm { background:#181a20; border-radius:12px; }
   .fade-in { animation: fadeIn .25s ease-out; }
   @keyframes fadeIn { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
-  .nav-btn.active { color:#22c55e; }
-  .nav-btn.active .nav-dot { opacity:1; }
   .statbar-fill { transition: width .4s ease; }
   #matchLog::-webkit-scrollbar{ display:none; }
   .kit-shirt { filter: drop-shadow(0 4px 8px rgba(0,0,0,.4)); }
   .pulse-live { animation: pulseLive 1.4s infinite; }
   @keyframes pulseLive { 0%,100%{opacity:1;} 50%{opacity:.35;} }
+  .no-scrollbar::-webkit-scrollbar { display:none; }
+  .no-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
+  .tab-btn { background:#181a20; color:#9ca3af; }
+  .tab-btn.active { background:#22c55e; color:#000; }
 </style>
 </head>
 <body class="bg-[#0f1015] text-white min-h-screen">
@@ -67,23 +69,24 @@
     <div id="loadSlots" class="space-y-3"></div>
   </div>
 
-<div id="app" class="hidden max-w-md mx-auto min-h-screen relative pb-24">
+<div id="app" class="hidden max-w-md mx-auto min-h-screen relative">
 
-  <!-- TOP BAR -->
+  <!-- CABECERA PRINCIPAL DEL CLUB -->
   <header class="sticky top-0 z-30 bg-[#0f1015]/95 backdrop-blur border-b border-white/5">
-    <div class="flex items-center justify-between px-4 py-3">
-      <div class="flex items-center gap-2.5 min-w-0">
-        <div id="topClubCrest" class="w-9 h-9 rounded-xl flex items-center justify-center text-[11px] font-black shadow-lg shrink-0">FCB</div>
+    <div class="flex items-center justify-between px-4 pt-3">
+      <div class="flex items-center gap-3 min-w-0">
+        <div id="topClubCrest" class="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-black shadow-lg shrink-0">FCB</div>
         <div class="min-w-0">
-          <p id="topClubName" class="font-bold text-sm leading-tight truncate">FC Barcelona</p>
-          <p class="text-[10px] text-gray-500 leading-tight">Temporada 2025/26</p>
+          <p id="topClubName" class="font-extrabold text-base leading-tight truncate">FC Barcelona</p>
+          <p id="topClubLeague" class="text-[10px] text-gray-500 leading-tight truncate">La Liga EA Sports · España</p>
         </div>
       </div>
-      <div class="flex items-center gap-3 text-xs font-semibold shrink-0">
-        <div class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-sack-dollar"></i><span id="topMoney">—</span></div>
-        <div class="flex items-center gap-1 text-pink-400"><i class="fa-solid fa-heart"></i><span id="topMorale">—</span></div>
+      <div class="flex items-center gap-2 shrink-0">
+        <div class="text-center">
+          <div id="clubRatingBadge" class="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black">85</div>
+        </div>
         <div class="relative">
-          <button id="topMenuBtn" onclick="toggleTopMenu()" class="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-gray-300">
+          <button id="topMenuBtn" onclick="toggleTopMenu()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-300">
             <i class="fa-solid fa-ellipsis-vertical text-xs"></i>
           </button>
           <div id="topMenuDropdown" class="hidden absolute right-0 mt-2 w-48 bg-[#1c1e26] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
@@ -93,41 +96,50 @@
         </div>
       </div>
     </div>
+    <div class="flex items-center gap-3 px-4 pt-2 pb-2 text-[11px] font-semibold">
+      <div class="flex items-center gap-1 text-emerald-400"><i class="fa-solid fa-sack-dollar"></i><span id="topMoney">—</span></div>
+      <div class="flex items-center gap-1 text-pink-400"><i class="fa-solid fa-heart"></i><span id="topMorale">—</span></div>
+    </div>
+    <!-- PESTAÑAS CON SCROLL HORIZONTAL -->
+    <nav class="flex gap-1.5 px-3 pb-2.5 overflow-x-auto no-scrollbar">
+      <button class="tab-btn active shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="club" onclick="switchView('club')">
+        <i class="fa-solid fa-shield-halved"></i> Club
+      </button>
+      <button class="tab-btn shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="squad" onclick="switchView('squad')">
+        <i class="fa-solid fa-people-group"></i> Plantilla
+      </button>
+      <button class="tab-btn shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="tactics" onclick="switchView('tactics')">
+        <i class="fa-solid fa-chess-board"></i> Tácticas
+      </button>
+      <button class="tab-btn shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="calendar" onclick="switchView('calendar')">
+        <i class="fa-solid fa-calendar-days"></i> Calendario
+      </button>
+      <button class="tab-btn shrink-0 px-3.5 py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition" data-view="office" onclick="switchView('office')">
+        <i class="fa-solid fa-briefcase"></i> Oficina
+      </button>
+    </nav>
   </header>
 
-  <main class="px-4 pt-4 space-y-4">
+  <main class="px-4 pt-4 pb-8 space-y-4">
 
     <!-- ============ VIEW: CLUB ============ -->
     <section id="view-club" class="fade-in space-y-4">
-      <div class="card p-5 space-y-4">
-        <div class="flex items-center gap-4">
-          <div id="clubCrestBig" class="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black shadow-xl shrink-0">FCB</div>
-          <div class="flex-1 min-w-0">
-            <h1 id="clubNameBig" class="text-xl font-extrabold truncate">FC Barcelona</h1>
-            <p id="clubLeagueLine" class="text-xs text-gray-400 truncate">La Liga EA Sports · España</p>
-          </div>
-          <div class="text-center shrink-0">
-            <div id="clubRatingBadge" class="w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black">85</div>
-            <p class="text-[10px] text-gray-500 mt-1">MEDIA</p>
-          </div>
+      <div class="grid grid-cols-4 gap-2 text-center">
+        <div class="card-sm py-2.5">
+          <p class="text-[10px] text-gray-500">Edad media</p>
+          <p id="statAvgAge" class="font-bold text-sm mt-0.5">—</p>
         </div>
-        <div class="grid grid-cols-4 gap-2 text-center">
-          <div class="card-sm py-2.5">
-            <p class="text-[10px] text-gray-500">Edad media</p>
-            <p id="statAvgAge" class="font-bold text-sm mt-0.5">—</p>
-          </div>
-          <div class="card-sm py-2.5">
-            <p class="text-[10px] text-gray-500">Nación</p>
-            <p id="statNation" class="font-bold text-sm mt-0.5">🇪🇸 ESP</p>
-          </div>
-          <div class="card-sm py-2.5">
-            <p class="text-[10px] text-gray-500">Valor</p>
-            <p id="statValue" class="font-bold text-sm mt-0.5">685M€</p>
-          </div>
-          <div class="card-sm py-2.5">
-            <p class="text-[10px] text-gray-500">Rival</p>
-            <p id="statRival" class="font-bold text-sm mt-0.5">R. Madrid</p>
-          </div>
+        <div class="card-sm py-2.5">
+          <p class="text-[10px] text-gray-500">Nación</p>
+          <p id="statNation" class="font-bold text-sm mt-0.5">🇪🇸 ESP</p>
+        </div>
+        <div class="card-sm py-2.5">
+          <p class="text-[10px] text-gray-500">Valor</p>
+          <p id="statValue" class="font-bold text-sm mt-0.5">685M€</p>
+        </div>
+        <div class="card-sm py-2.5">
+          <p class="text-[10px] text-gray-500">Rival</p>
+          <p id="statRival" class="font-bold text-sm mt-0.5">R. Madrid</p>
         </div>
       </div>
 
@@ -172,6 +184,11 @@
           <i class="fa-solid fa-chevron-right text-gray-600 text-xs"></i>
         </div>
       </div>
+
+      <div class="space-y-2 pb-2">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Historia del club</p>
+        <div class="card p-4" id="clubHistoryBlock"></div>
+      </div>
     </section>
 
     <!-- ============ VIEW: SQUAD ============ -->
@@ -195,10 +212,38 @@
       <div id="squadGrid" class="flex flex-col gap-2.5"></div>
     </section>
 
-    <!-- ============ VIEW: MATCH ============ -->
-    <section id="view-match" class="hidden fade-in space-y-4">
-      <div class="card p-4 grid grid-cols-4 gap-2 text-center" id="recordBlock"></div>
+    <!-- ============ VIEW: TÁCTICAS ============ -->
+    <section id="view-tactics" class="hidden fade-in space-y-4">
+      <div class="card p-4">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Formación</p>
+        <div class="grid grid-cols-4 gap-2" id="formationButtons"></div>
+      </div>
 
+      <div class="card p-4">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Once inicial</p>
+        <div id="pitchView" class="relative w-full aspect-[3/4] rounded-xl bg-gradient-to-b from-emerald-800/40 to-emerald-950/60 border border-emerald-500/20 overflow-hidden"></div>
+      </div>
+
+      <div class="card p-4">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Mentalidad</p>
+        <div class="grid grid-cols-3 gap-2" id="mentalityButtons"></div>
+      </div>
+
+      <div class="card p-4 space-y-3 pb-2">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Lanzadores</p>
+        <div class="space-y-1.5">
+          <label class="text-[10px] text-gray-500 font-bold uppercase">Penaltis</label>
+          <select id="penaltyTakerSelect" onchange="state.tactics.penalty=this.value" class="w-full bg-[#0f1015] border border-white/10 rounded-lg px-3 py-2.5 text-sm"></select>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-[10px] text-gray-500 font-bold uppercase">Faltas</label>
+          <select id="freekickTakerSelect" onchange="state.tactics.freekick=this.value" class="w-full bg-[#0f1015] border border-white/10 rounded-lg px-3 py-2.5 text-sm"></select>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VIEW: CALENDARIO / PARTIDOS ============ -->
+    <section id="view-calendar" class="hidden fade-in space-y-4">
       <div class="card p-5">
         <div class="flex items-center justify-between mb-1">
           <span id="matchStatusLabel" class="text-[10px] font-bold uppercase tracking-wide text-gray-500">Listo para jugar</span>
@@ -220,30 +265,65 @@
           </div>
         </div>
         <button id="playBtn" onclick="startMatch()" class="mt-5 w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-3 rounded-xl transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-play"></i> Jugar Partido
+          <i class="fa-solid fa-play"></i> Jugar Siguiente Partido
         </button>
       </div>
 
       <div class="card p-4">
         <p class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Comentarios en vivo</p>
-        <div id="matchLog" class="space-y-1.5 h-56 overflow-y-auto text-xs text-gray-300 pr-1">
-          <p class="text-gray-600 italic">Pulsa "Jugar Partido" para simular el encuentro…</p>
+        <div id="matchLog" class="space-y-1.5 h-48 overflow-y-auto text-xs text-gray-300 pr-1">
+          <p class="text-gray-600 italic">Pulsa "Jugar Siguiente Partido" para simular el encuentro…</p>
         </div>
+      </div>
+
+      <div class="card p-4">
+        <div class="flex items-center justify-between mb-2">
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Clasificación</p>
+          <span id="roundLabel" class="text-[10px] text-gray-500 font-bold"></span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-[11px]" id="standingsTable"></table>
+        </div>
+      </div>
+
+      <div class="space-y-2 pb-2">
+        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide px-1">Calendario de la temporada</p>
+        <div id="fixtureList" class="space-y-2"></div>
       </div>
     </section>
 
-    <!-- ============ VIEW: MARKET ============ -->
-    <section id="view-market" class="hidden fade-in space-y-4">
-      <div class="card p-4 flex items-center justify-between">
+    <!-- ============ VIEW: OFICINA / MERCADO ============ -->
+    <section id="view-office" class="hidden fade-in space-y-4">
+      <div class="card p-4 grid grid-cols-2 gap-3">
         <div>
-          <p class="text-[10px] text-gray-500 uppercase font-bold">Presupuesto disponible</p>
-          <p class="font-bold text-emerald-400 text-lg" id="marketMoney">—</p>
+          <p class="text-[10px] text-gray-500 uppercase font-bold">Presupuesto</p>
+          <p id="officeMoney" class="font-black text-emerald-400 text-lg mt-0.5">—</p>
         </div>
-        <button onclick="refreshMarket()" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg font-semibold flex items-center gap-1.5">
-          <i class="fa-solid fa-rotate"></i> Actualizar
-        </button>
+        <div>
+          <p class="text-[10px] text-gray-500 uppercase font-bold">Masa salarial / semana</p>
+          <p id="officeWageBill" class="font-black text-sm mt-0.5">—</p>
+        </div>
       </div>
-      <div id="marketList" class="space-y-2.5"></div>
+
+      <div class="card p-4 space-y-3">
+        <div class="flex items-center justify-between gap-2">
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Ojeadores</p>
+          <button onclick="scoutPlayer()" class="text-[11px] bg-emerald-500 hover:bg-emerald-400 text-black font-bold px-3 py-2 rounded-lg flex items-center gap-1.5 shrink-0">
+            <i class="fa-solid fa-binoculars"></i> Enviar (500k€)
+          </button>
+        </div>
+        <div id="scoutList" class="space-y-2"></div>
+      </div>
+
+      <div class="space-y-2 pb-2">
+        <div class="flex items-center justify-between px-1">
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Mercado de fichajes</p>
+          <button onclick="refreshMarket()" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg font-semibold flex items-center gap-1.5">
+            <i class="fa-solid fa-rotate"></i> Actualizar
+          </button>
+        </div>
+        <div id="marketList" class="space-y-2.5"></div>
+      </div>
     </section>
 
   </main>
@@ -321,27 +401,6 @@
     </div>
   </div>
 
-  <!-- BOTTOM NAV -->
-  <nav class="fixed bottom-0 inset-x-0 z-40">
-    <div class="max-w-md mx-auto bg-[#181a20] border-t border-white/5 flex justify-around py-2 px-1">
-      <button class="nav-btn active flex-1 flex flex-col items-center gap-1 py-1.5 text-gray-500 relative" data-view="club" onclick="switchView('club')">
-        <i class="fa-solid fa-shield-halved text-lg"></i>
-        <span class="text-[10px] font-semibold">Club</span>
-      </button>
-      <button class="nav-btn flex-1 flex flex-col items-center gap-1 py-1.5 text-gray-500 relative" data-view="squad" onclick="switchView('squad')">
-        <i class="fa-solid fa-people-group text-lg"></i>
-        <span class="text-[10px] font-semibold">Plantilla</span>
-      </button>
-      <button class="nav-btn flex-1 flex flex-col items-center gap-1 py-1.5 text-gray-500 relative" data-view="match" onclick="switchView('match')">
-        <i class="fa-solid fa-futbol text-lg"></i>
-        <span class="text-[10px] font-semibold">Simular</span>
-      </button>
-      <button class="nav-btn flex-1 flex flex-col items-center gap-1 py-1.5 text-gray-500 relative" data-view="market" onclick="switchView('market')">
-        <i class="fa-solid fa-money-bill-transfer text-lg"></i>
-        <span class="text-[10px] font-semibold">Mercado</span>
-      </button>
-    </div>
-  </nav>
 </div>
 
 <script>
@@ -459,11 +518,13 @@ const COUNTRIES = {
 const state = {
   money: 42_000_000,
   morale: 78,
-  record: { played: 0, wins: 0, draws: 0, losses: 0, points: 0 },
   manager: { name: "Hansi Flick", role: "Entrenador" },
   club: null,
   players: [],
   market: [],
+  scoutReports: [],
+  season: null,
+  tactics: { formation: "4-3-3", mentality: "Equilibrada", penalty: null, freekick: null, xi: [] },
   currentModalPlayerId: null,
   rival: null,
   matchTimer: null,
@@ -627,8 +688,148 @@ function pickRival(club) {
   if (!others.length) return "—";
   return pickRandom(others).name;
 }
-function getLeagueRivalPool() {
-  return leagueClubs(state.club).filter(c => c.name !== state.club.name).map(c => ({ name: c.name, tag: c.tag, rating: c.rating }));
+
+const CLUB_HISTORY = {
+  "FC Barcelona": { founded: 1899, titles: "27 Ligas · 5 Champions League" }
+};
+function clubHistory(club) {
+  if (CLUB_HISTORY[club.name]) return CLUB_HISTORY[club.name];
+  const seed = hashStr(club.name);
+  const founded = 1880 + (seed % 45);
+  const leagueTitles = Math.max(0, Math.round((club.rating - 68) * 0.6 + seededInt(seed, 0, 4)));
+  return { founded, titles: leagueTitles > 0 ? `${leagueTitles} títulos de liga` : "Sin títulos de liga en su historia" };
+}
+function wageBill() {
+  return state.players.reduce((s, p) => s + computeWage(p), 0);
+}
+
+/* ============================================================
+   TÁCTICAS: FORMACIONES Y ONCE INICIAL
+   ============================================================ */
+const FORMATIONS = {
+  "4-3-3": { slots: [
+    { x: 50, y: 92, role: "POR" },
+    { x: 15, y: 74, role: "LI" }, { x: 38, y: 78, role: "DFC" }, { x: 62, y: 78, role: "DFC" }, { x: 85, y: 74, role: "LD" },
+    { x: 25, y: 52, role: "MC" }, { x: 50, y: 56, role: "MC" }, { x: 75, y: 52, role: "MC" },
+    { x: 15, y: 26, role: "EI" }, { x: 50, y: 15, role: "DC" }, { x: 85, y: 26, role: "ED" }
+  ] },
+  "4-4-2": { slots: [
+    { x: 50, y: 92, role: "POR" },
+    { x: 15, y: 74, role: "LI" }, { x: 38, y: 78, role: "DFC" }, { x: 62, y: 78, role: "DFC" }, { x: 85, y: 74, role: "LD" },
+    { x: 15, y: 50, role: "MI" }, { x: 38, y: 54, role: "MC" }, { x: 62, y: 54, role: "MC" }, { x: 85, y: 50, role: "MD" },
+    { x: 35, y: 17, role: "DC" }, { x: 65, y: 17, role: "DC" }
+  ] },
+  "4-2-3-1": { slots: [
+    { x: 50, y: 92, role: "POR" },
+    { x: 15, y: 74, role: "LI" }, { x: 38, y: 78, role: "DFC" }, { x: 62, y: 78, role: "DFC" }, { x: 85, y: 74, role: "LD" },
+    { x: 35, y: 58, role: "MCD" }, { x: 65, y: 58, role: "MCD" },
+    { x: 15, y: 33, role: "EI" }, { x: 50, y: 37, role: "MCO" }, { x: 85, y: 33, role: "ED" },
+    { x: 50, y: 13, role: "DC" }
+  ] },
+  "3-5-2": { slots: [
+    { x: 50, y: 92, role: "POR" },
+    { x: 25, y: 78, role: "DFC" }, { x: 50, y: 82, role: "DFC" }, { x: 75, y: 78, role: "DFC" },
+    { x: 10, y: 52, role: "LI" }, { x: 32, y: 56, role: "MC" }, { x: 50, y: 60, role: "MCD" }, { x: 68, y: 56, role: "MC" }, { x: 90, y: 52, role: "LD" },
+    { x: 35, y: 19, role: "DC" }, { x: 65, y: 19, role: "DC" }
+  ] }
+};
+const MENTALITY_MULT = {
+  "Defensiva": { home: 0.7, away: 0.6 },
+  "Equilibrada": { home: 1, away: 1 },
+  "Ofensiva": { home: 1.35, away: 1.55 }
+};
+function pickXI(formationKey) {
+  const slots = FORMATIONS[formationKey].slots;
+  const used = new Set();
+  return slots.map(slot => {
+    let candidates = state.players.filter(p => !used.has(p.id) && p.positions.includes(slot.role));
+    if (!candidates.length) {
+      const cat = positionCategory(slot.role);
+      candidates = state.players.filter(p => !used.has(p.id) && positionCategory(p.position) === cat);
+    }
+    if (!candidates.length) candidates = state.players.filter(p => !used.has(p.id));
+    const best = candidates.sort((a, b) => b.ovr - a.ovr)[0];
+    if (best) used.add(best.id);
+    return { slot, player: best || null };
+  });
+}
+function pickWeightedAttacker() {
+  const xiPlayers = state.tactics.xi.map(id => findPlayer(id)).filter(Boolean);
+  const pool = xiPlayers.length ? xiPlayers : state.players;
+  const weighted = [];
+  pool.forEach(p => {
+    const cat = positionCategory(p.position);
+    const w = cat === "Delanteros" ? 5 : cat === "Centrocampistas" ? 3 : cat === "Defensas" ? 1 : 0.3;
+    for (let i = 0; i < Math.round(w * 2); i++) weighted.push(p);
+  });
+  return pickRandom(weighted.length ? weighted : pool);
+}
+
+/* ============================================================
+   TEMPORADA: CALENDARIO, RESULTADOS Y CLASIFICACIÓN
+   ============================================================ */
+function generateRoundRobin(names) {
+  const list = names.slice();
+  const n = list.length;
+  const rounds = [];
+  for (let r = 0; r < n - 1; r++) {
+    const round = [];
+    for (let i = 0; i < n / 2; i++) {
+      const home = list[i], away = list[n - 1 - i];
+      round.push(r % 2 === 0 ? [home, away] : [away, home]);
+    }
+    rounds.push(round);
+    list.splice(1, 0, list.pop());
+  }
+  return rounds;
+}
+function buildSeason(club) {
+  const clubs = leagueClubs(club).map(c => c.name);
+  const names = clubs.length % 2 === 0 ? clubs.slice() : [...clubs, "BYE"];
+  const fixtures = generateRoundRobin(names);
+  const table = {};
+  clubs.forEach(name => { table[name] = { played: 0, wins: 0, draws: 0, losses: 0, gf: 0, ga: 0, points: 0 }; });
+  const userFixtures = [];
+  fixtures.forEach((round, i) => {
+    round.forEach(([home, away]) => {
+      if (home === "BYE" || away === "BYE") return;
+      if (home === club.name || away === club.name) {
+        userFixtures.push({ round: i, opponent: home === club.name ? away : home, home: home === club.name, played: false, gf: null, ga: null });
+      }
+    });
+  });
+  return { fixtures, table, userFixtures, round: 0 };
+}
+function applyResult(name, gf, ga) {
+  const t = state.season.table[name];
+  if (!t) return;
+  t.played++; t.gf += gf; t.ga += ga;
+  if (gf > ga) { t.wins++; t.points += 3; } else if (gf === ga) { t.draws++; t.points += 1; } else { t.losses++; }
+}
+function poissonGoals(lambda) {
+  lambda = Math.max(0.15, lambda);
+  const l = Math.exp(-lambda);
+  let k = 0, p = 1;
+  do { k++; p *= Math.random(); } while (p > l);
+  return k - 1;
+}
+function quickSimScore(ratingHome, ratingAway) {
+  const diff = ratingHome - ratingAway;
+  return [poissonGoals(1.3 + diff * 0.03), poissonGoals(1.1 - diff * 0.03)];
+}
+function simulateRemainingRoundMatches(roundIndex) {
+  const round = state.season.fixtures[roundIndex];
+  const clubsInfo = leagueClubs(state.club);
+  round.forEach(([home, away]) => {
+    if (home === "BYE" || away === "BYE") return;
+    if (home === state.club.name || away === state.club.name) return;
+    const homeInfo = clubsInfo.find(c => c.name === home);
+    const awayInfo = clubsInfo.find(c => c.name === away);
+    if (!homeInfo || !awayInfo) return;
+    const [gh, ga] = quickSimScore(homeInfo.rating, awayInfo.rating);
+    applyResult(home, gh, ga);
+    applyResult(away, ga, gh);
+  });
 }
 
 /* ============================================================
@@ -642,6 +843,11 @@ function renderTopBar() {
   crest.textContent = state.club.tag;
   crest.style.background = crestGradient(state.club);
   document.getElementById("topClubName").textContent = state.club.name;
+  document.getElementById("topClubLeague").textContent = state.club.league + " · " + state.club.country;
+  const badge = document.getElementById("clubRatingBadge");
+  const rating = teamRating();
+  badge.textContent = rating;
+  badge.className = "w-10 h-10 rounded-xl flex items-center justify-center text-sm font-black " + ovrBadgeClass(rating);
 }
 
 /* ============================================================
@@ -650,16 +856,7 @@ function renderTopBar() {
 function renderClub() {
   if (!state.club) return;
   const rating = teamRating();
-  const badge = document.getElementById("clubRatingBadge");
-  badge.textContent = rating;
-  badge.className = "w-12 h-12 rounded-xl flex items-center justify-center text-xl font-black " + ovrBadgeClass(rating);
   document.getElementById("statAvgAge").textContent = avgAge() + " años";
-
-  const crestBig = document.getElementById("clubCrestBig");
-  crestBig.textContent = state.club.tag;
-  crestBig.style.background = crestGradient(state.club);
-  document.getElementById("clubNameBig").textContent = state.club.name;
-  document.getElementById("clubLeagueLine").textContent = state.club.league + " · " + state.club.country;
   document.getElementById("statNation").textContent = state.club.countryFlag + " " + state.club.countryCode;
   document.getElementById("statValue").textContent = fmtMoney(totalMarketValue() * 1_000_000);
   document.getElementById("statRival").textContent = state.club.rival;
@@ -705,6 +902,17 @@ function renderClub() {
       <p class="text-[10px] text-gray-500 font-bold mt-1.5">${s.label}</p>
     </div>
   `).join("");
+
+  const hist = clubHistory(state.club);
+  document.getElementById("clubHistoryBlock").innerHTML = `
+    <div class="flex items-center gap-4">
+      <div class="w-11 h-11 rounded-lg bg-white/5 flex items-center justify-center text-emerald-400 shrink-0"><i class="fa-solid fa-scroll text-sm"></i></div>
+      <div>
+        <p class="text-sm font-semibold">Fundado en ${hist.founded}</p>
+        <p class="text-xs text-gray-500 mt-0.5">${hist.titles}</p>
+      </div>
+    </div>
+  `;
 }
 
 /* ============================================================
@@ -750,6 +958,40 @@ function renderSquad() {
   `;
   }).join("");
 }
+
+/* ============================================================
+   RENDER: TÁCTICAS
+   ============================================================ */
+function renderTactics() {
+  document.getElementById("formationButtons").innerHTML = Object.keys(FORMATIONS).map(f => `
+    <button onclick="selectFormation('${f}')" class="py-2.5 rounded-xl text-xs font-bold transition ${state.tactics.formation === f ? "bg-emerald-500 text-black" : "bg-white/5 text-gray-300"}">${f}</button>
+  `).join("");
+
+  document.getElementById("mentalityButtons").innerHTML = Object.keys(MENTALITY_MULT).map(m => `
+    <button onclick="selectMentality('${m}')" class="py-2.5 rounded-xl text-xs font-bold transition ${state.tactics.mentality === m ? "bg-emerald-500 text-black" : "bg-white/5 text-gray-300"}">${m}</button>
+  `).join("");
+
+  const xi = pickXI(state.tactics.formation);
+  state.tactics.xi = xi.map(x => x.player && x.player.id).filter(Boolean);
+  document.getElementById("pitchView").innerHTML = xi.map(({ slot, player }) => `
+    <div class="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1" style="left:${slot.x}%; top:${slot.y}%">
+      <div class="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white/30 shadow-lg" style="background:${player ? avatarColor(player.name) : "#374151"}">${player ? initials(player.name) : "-"}</div>
+      <p class="text-[8px] font-bold text-white bg-black/60 px-1 py-0.5 rounded truncate max-w-[56px]">${player ? player.name.split(" ").slice(-1)[0] : slot.role}</p>
+    </div>
+  `).join("");
+
+  const options = [...state.players].sort((a, b) => b.ovr - a.ovr).map(p => `<option value="${p.id}">${p.name} (${p.ovr})</option>`).join("");
+  const penSel = document.getElementById("penaltyTakerSelect");
+  penSel.innerHTML = options;
+  if (state.tactics.penalty && findPlayer(state.tactics.penalty)) penSel.value = state.tactics.penalty;
+  else state.tactics.penalty = penSel.value;
+  const fkSel = document.getElementById("freekickTakerSelect");
+  fkSel.innerHTML = options;
+  if (state.tactics.freekick && findPlayer(state.tactics.freekick)) fkSel.value = state.tactics.freekick;
+  else state.tactics.freekick = fkSel.value;
+}
+function selectFormation(f) { state.tactics.formation = f; renderTactics(); }
+function selectMentality(m) { state.tactics.mentality = m; renderTactics(); }
 
 /* ============================================================
    MODAL DE JUGADOR
@@ -860,7 +1102,6 @@ function buyPlayer(mid) {
   renderClub();
 }
 function renderMarket() {
-  document.getElementById("marketMoney").textContent = fmtMoney(state.money);
   document.getElementById("marketList").innerHTML = state.market.map(p => `
     <div class="card p-3.5 flex items-center gap-3">
       <div class="w-11 h-11 rounded-full flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
@@ -876,6 +1117,56 @@ function renderMarket() {
 }
 
 /* ============================================================
+   RENDER: OFICINA (presupuesto + ojeadores)
+   ============================================================ */
+function renderOffice() {
+  document.getElementById("officeMoney").textContent = fmtMoney(state.money);
+  document.getElementById("officeWageBill").textContent = fmtMoney(wageBill());
+  document.getElementById("scoutList").innerHTML = state.scoutReports.length ? state.scoutReports.map(p => `
+    <div class="card-sm p-3 flex items-center gap-3">
+      <div class="w-11 h-11 rounded-full flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
+      <div class="flex-1 min-w-0">
+        <p class="font-bold text-xs truncate">${p.name}</p>
+        <p class="text-[10px] text-gray-500 font-semibold">${p.position} · ${p.age} años · joven promesa</p>
+      </div>
+      <span class="text-[11px] font-black px-1.5 py-0.5 rounded ${ovrBadgeClass(p.ovr)}">${p.ovr}</span>
+      <button onclick="signScoutedPlayer('${p.id}')" class="text-[11px] font-bold bg-emerald-500 hover:bg-emerald-400 text-black px-3 py-2 rounded-lg shrink-0">${fmtMoney(p.scoutPrice)}</button>
+    </div>
+  `).join("") : `<p class="text-xs text-gray-600 italic">Envía un ojeador para descubrir jóvenes talentos.</p>`;
+  if (state.market.length === 0) refreshMarket(); else renderMarket();
+}
+function scoutPlayer() {
+  const cost = 500000;
+  if (state.money < cost) { alert("No tienes presupuesto suficiente para enviar un ojeador (500k€)."); return; }
+  state.money -= cost;
+  const allPos = Object.values(POSITION_GROUPS).flat();
+  const pos = pickRandom(allPos);
+  const name = MARKET_FIRST[Math.floor(Math.random() * MARKET_FIRST.length)] + " " + MARKET_LAST[Math.floor(Math.random() * MARKET_LAST.length)];
+  const age = 16 + Math.floor(Math.random() * 5);
+  const height = 170 + Math.floor(Math.random() * 20);
+  const weight = 62 + Math.floor(Math.random() * 18);
+  const ovr = 62 + Math.floor(Math.random() * 16);
+  const player = makePlayer({ name, positions: [pos], age, height, weight, ovr });
+  player.scoutPrice = Math.round(computeMarketValue(player) * 1_000_000 * 0.55);
+  state.scoutReports.push(player);
+  renderTopBar();
+  renderOffice();
+}
+function signScoutedPlayer(id) {
+  const p = state.scoutReports.find(pl => pl.id === id);
+  if (!p) return;
+  if (state.money < p.scoutPrice) { alert("No tienes presupuesto suficiente para fichar a este jugador."); return; }
+  if (!confirm(`¿Fichar a ${p.name} por ${fmtMoney(p.scoutPrice)}?`)) return;
+  state.money -= p.scoutPrice;
+  state.players.push(p);
+  state.scoutReports = state.scoutReports.filter(pl => pl.id !== id);
+  renderTopBar();
+  renderOffice();
+  renderSquad();
+  renderClub();
+}
+
+/* ============================================================
    SIMULADOR DE PARTIDO
    ============================================================ */
 function renderMatchTeam() {
@@ -885,18 +1176,65 @@ function renderMatchTeam() {
   crest.style.background = crestGradient(state.club);
   document.getElementById("teamNameSmall").textContent = state.club.name;
 }
-function renderRecord() {
-  const r = state.record;
-  const items = [
-    { label: "PJ", value: r.played }, { label: "G", value: r.wins },
-    { label: "E", value: r.draws }, { label: "P", value: r.losses }
-  ];
-  document.getElementById("recordBlock").innerHTML = items.map(i => `
-    <div>
-      <p class="text-lg font-black">${i.value}</p>
-      <p class="text-[10px] text-gray-500 font-bold">${i.label}</p>
-    </div>
-  `).join("") + `<div class="col-span-4 text-center border-t border-white/5 pt-2 mt-1"><span class="text-emerald-400 font-bold text-sm">${r.points} puntos</span></div>`;
+function renderStandings() {
+  const rows = Object.entries(state.season.table).map(([name, t]) => ({ name, ...t, dg: t.gf - t.ga }));
+  rows.sort((a, b) => b.points - a.points || b.dg - a.dg || b.gf - a.gf);
+  document.getElementById("roundLabel").textContent = `Jornada ${Math.min(state.season.round + 1, state.season.fixtures.length)} / ${state.season.fixtures.length}`;
+  document.getElementById("standingsTable").innerHTML = `
+    <thead><tr class="text-gray-500 text-left"><th class="py-1 pr-1">#</th><th class="py-1 pr-1">Club</th><th class="py-1 px-1 text-center">PJ</th><th class="py-1 px-1 text-center">G</th><th class="py-1 px-1 text-center">E</th><th class="py-1 px-1 text-center">P</th><th class="py-1 px-1 text-center">DG</th><th class="py-1 pl-1 text-center">Pts</th></tr></thead>
+    <tbody>
+      ${rows.map((r, i) => `
+        <tr class="${r.name === state.club.name ? "bg-emerald-500/10" : ""} border-t border-white/5">
+          <td class="py-1.5 pr-1 text-gray-500">${i + 1}</td>
+          <td class="py-1.5 pr-1 font-semibold truncate max-w-[100px]">${r.name}</td>
+          <td class="py-1.5 px-1 text-center text-gray-400">${r.played}</td>
+          <td class="py-1.5 px-1 text-center text-gray-400">${r.wins}</td>
+          <td class="py-1.5 px-1 text-center text-gray-400">${r.draws}</td>
+          <td class="py-1.5 px-1 text-center text-gray-400">${r.losses}</td>
+          <td class="py-1.5 px-1 text-center text-gray-400">${r.dg > 0 ? "+" : ""}${r.dg}</td>
+          <td class="py-1.5 pl-1 text-center font-black text-emerald-400">${r.points}</td>
+        </tr>
+      `).join("")}
+    </tbody>
+  `;
+}
+function renderFixtures() {
+  document.getElementById("fixtureList").innerHTML = state.season.userFixtures.map(f => {
+    const right = f.played
+      ? `<span class="font-black text-sm ${f.gf > f.ga ? "text-emerald-400" : f.gf === f.ga ? "text-gray-400" : "text-red-400"}">${f.gf} - ${f.ga}</span>`
+      : `<span class="text-[10px] text-gray-500 font-semibold">Pendiente</span>`;
+    return `
+    <div class="card-sm p-3 flex items-center justify-between gap-2">
+      <div class="min-w-0">
+        <p class="text-[10px] text-gray-500 font-bold">Jornada ${f.round + 1} · ${f.home ? "Local" : "Visitante"}</p>
+        <p class="text-sm font-semibold truncate">${f.opponent}</p>
+      </div>
+      ${right}
+    </div>`;
+  }).join("");
+}
+function renderCalendar() {
+  renderMatchTeam();
+  const fixture = state.season.userFixtures.find(f => !f.played);
+  const playBtn = document.getElementById("playBtn");
+  if (fixture) {
+    const oppInfo = leagueClubs(state.club).find(c => c.name === fixture.opponent);
+    document.getElementById("rivalName").textContent = fixture.opponent;
+    const rivalCrest = document.getElementById("rivalCrest");
+    rivalCrest.textContent = oppInfo ? oppInfo.tag : "RIV";
+    rivalCrest.style.background = oppInfo ? crestGradient(oppInfo) : "#374151";
+    playBtn.disabled = false;
+    playBtn.classList.remove("opacity-40");
+    playBtn.innerHTML = `<i class="fa-solid fa-play"></i> Jugar Siguiente Partido (J${fixture.round + 1})`;
+  } else {
+    document.getElementById("rivalName").textContent = "—";
+    document.getElementById("rivalCrest").textContent = "—";
+    playBtn.disabled = true;
+    playBtn.classList.add("opacity-40");
+    playBtn.innerHTML = `<i class="fa-solid fa-trophy"></i> Temporada finalizada`;
+  }
+  renderStandings();
+  renderFixtures();
 }
 
 const COMMENTARY_NEUTRAL = [
@@ -931,11 +1269,16 @@ function logMessage(minute, text, type) {
 
 function startMatch() {
   if (state.matchTimer) return;
-  state.rival = pickRandom(getLeagueRivalPool());
+  const fixture = state.season.userFixtures.find(f => !f.played);
+  if (!fixture) { alert("¡Temporada finalizada! No quedan partidos por jugar."); return; }
+  const oppInfo = leagueClubs(state.club).find(c => c.name === fixture.opponent);
+  state.rival = oppInfo || { name: fixture.opponent, tag: "RIV", rating: 75 };
   const rating = teamRating();
 
   document.getElementById("rivalName").textContent = state.rival.name;
-  document.getElementById("rivalCrest").textContent = state.rival.tag;
+  const rivalCrest = document.getElementById("rivalCrest");
+  rivalCrest.textContent = state.rival.tag;
+  rivalCrest.style.background = crestGradient(state.rival);
   document.getElementById("scoreHome").textContent = "0";
   document.getElementById("scoreAway").textContent = "0";
   document.getElementById("matchLog").innerHTML = "";
@@ -946,13 +1289,14 @@ function startMatch() {
   document.getElementById("playBtn").classList.add("opacity-40");
   document.getElementById("playBtn").innerHTML = `<i class="fa-solid fa-hourglass-half"></i> Partido en curso…`;
 
-  logMessage(0, `¡Comienza el partido contra ${state.rival.name}!`, "neutral");
+  logMessage(0, `¡Comienza el partido (${fixture.home ? "Local" : "Visitante"}) contra ${state.rival.name}! Formación: ${state.tactics.formation} · ${state.tactics.mentality}.`, "neutral");
 
   let minute = 0;
   let scoreHome = 0, scoreAway = 0;
+  const mult = MENTALITY_MULT[state.tactics.mentality] || MENTALITY_MULT["Equilibrada"];
   const diff = rating - state.rival.rating;
-  const homeChance = clamp(0.05 + diff * 0.002, 0.015, 0.14);
-  const awayChance = clamp(0.05 - diff * 0.002, 0.015, 0.14);
+  const homeChance = clamp((0.05 + diff * 0.002) * mult.home, 0.01, 0.18);
+  const awayChance = clamp((0.05 - diff * 0.002) * mult.away, 0.01, 0.18);
 
   state.matchTimer = setInterval(() => {
     minute++;
@@ -962,12 +1306,19 @@ function startMatch() {
     if (roll < homeChance) {
       scoreHome++;
       document.getElementById("scoreHome").textContent = scoreHome;
-      logMessage(minute, `¡GOL del ${state.club.name}! El marcador se mueve.`, "goal");
+      const isPenalty = Math.random() < 0.15 && state.tactics.penalty;
+      const scorer = isPenalty ? findPlayer(state.tactics.penalty) : pickWeightedAttacker();
+      logMessage(minute, `⚽ ¡GOOOL! ${scorer ? scorer.name : state.club.name}${isPenalty ? " (de penalti)" : ""} pone el ${scoreHome}-${scoreAway}.`, "goal");
     } else if (roll < homeChance + awayChance) {
       scoreAway++;
       document.getElementById("scoreAway").textContent = scoreAway;
-      logMessage(minute, `Gol de ${state.rival.name}. Responden en el marcador.`, "goal");
-    } else if (roll < homeChance + awayChance + 0.12) {
+      logMessage(minute, `Gol de ${state.rival.name}. Se ponen ${scoreHome}-${scoreAway}.`, "goal");
+    } else if (roll < homeChance + awayChance + 0.015) {
+      const carded = pickRandom(state.players);
+      logMessage(minute, `🟨 Tarjeta amarilla para ${carded.name} (${state.club.name}).`, "neutral");
+    } else if (roll < homeChance + awayChance + 0.03) {
+      logMessage(minute, `🟨 Tarjeta amarilla para un jugador de ${state.rival.name}.`, "neutral");
+    } else if (roll < homeChance + awayChance + 0.03 + 0.12) {
       logMessage(minute, pickRandom(COMMENTARY_CHANCE), "chance");
     } else if (minute % 4 === 0) {
       logMessage(minute, pickRandom(COMMENTARY_NEUTRAL), "neutral");
@@ -984,21 +1335,21 @@ function startMatch() {
 function finishMatch(home, away) {
   document.getElementById("matchStatusLabel").textContent = "Partido finalizado";
   document.getElementById("matchMinute").classList.add("hidden");
-  document.getElementById("playBtn").disabled = false;
-  document.getElementById("playBtn").classList.remove("opacity-40");
-  document.getElementById("playBtn").innerHTML = `<i class="fa-solid fa-play"></i> Jugar otro partido`;
 
-  state.record.played++;
+  const fixture = state.season.userFixtures.find(f => !f.played);
+  fixture.played = true; fixture.gf = home; fixture.ga = away;
+  applyResult(state.club.name, home, away);
+  applyResult(fixture.opponent, away, home);
+  simulateRemainingRoundMatches(fixture.round);
+  state.season.round = fixture.round + 1;
+
   let result, moneyDelta, moraleDelta;
   if (home > away) {
-    result = "¡Victoria!"; state.record.wins++; state.record.points += 3;
-    moneyDelta = 2_000_000; moraleDelta = 10;
+    result = "¡Victoria!"; moneyDelta = 2_000_000; moraleDelta = 10;
   } else if (home === away) {
-    result = "Empate."; state.record.draws++; state.record.points += 1;
-    moneyDelta = 500_000; moraleDelta = 2;
+    result = "Empate."; moneyDelta = 500_000; moraleDelta = 2;
   } else {
-    result = "Derrota."; state.record.losses++;
-    moneyDelta = 200_000; moraleDelta = -8;
+    result = "Derrota."; moneyDelta = 200_000; moraleDelta = -8;
   }
   state.money += moneyDelta;
   state.morale = clamp(state.morale + moraleDelta, 0, 100);
@@ -1007,20 +1358,22 @@ function finishMatch(home, away) {
   logMessage(90, `Ingresos por taquilla: ${fmtMoney(moneyDelta)}. Moral del equipo: ${state.morale}%.`, "neutral");
 
   renderTopBar();
-  renderRecord();
+  renderCalendar();
 }
 
 /* ============================================================
    NAVEGACIÓN (pestañas dentro del modo carrera)
    ============================================================ */
 function switchView(view) {
-  ["club", "squad", "match", "market"].forEach(v => {
+  ["club", "squad", "tactics", "calendar", "office"].forEach(v => {
     document.getElementById("view-" + v).classList.toggle("hidden", v !== view);
   });
-  document.querySelectorAll(".nav-btn").forEach(btn => {
+  document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.classList.toggle("active", btn.dataset.view === view);
   });
-  if (view === "market" && state.market.length === 0) refreshMarket();
+  if (view === "tactics") renderTactics();
+  if (view === "calendar") { renderStandings(); renderFixtures(); }
+  if (view === "office") renderOffice();
 }
 
 /* ============================================================
@@ -1090,8 +1443,10 @@ function saveGame(silent) {
     manager: state.manager,
     money: state.money,
     morale: state.morale,
-    record: state.record,
     players: state.players,
+    scoutReports: state.scoutReports,
+    tactics: state.tactics,
+    season: state.season,
     teamRating: teamRating()
   };
   writeSlot(state.saveSlot, data);
@@ -1105,8 +1460,10 @@ function restoreState(data, slot) {
   state.manager = data.manager;
   state.money = data.money;
   state.morale = data.morale;
-  state.record = data.record;
   state.players = data.players;
+  state.scoutReports = data.scoutReports || [];
+  state.tactics = data.tactics || { formation: "4-3-3", mentality: "Equilibrada", penalty: null, freekick: null, xi: [] };
+  state.season = data.season || buildSeason(data.club);
   state.market = [];
   state.saveSlot = slot;
   renderAll();
@@ -1261,8 +1618,10 @@ function startCareerFromNewGame(slot) {
   state.manager = isReal ? { name: "Hansi Flick", role: "Entrenador" } : { name: generateManagerName(), role: "Entrenador" };
   state.money = Math.round(teamEntry.rating * 500_000 + 5_000_000);
   state.morale = 78;
-  state.record = { played: 0, wins: 0, draws: 0, losses: 0, points: 0 };
   state.market = [];
+  state.scoutReports = [];
+  state.tactics = { formation: "4-3-3", mentality: "Equilibrada", penalty: null, freekick: null, xi: [] };
+  state.season = buildSeason(club);
   state.saveSlot = slot;
 
   saveGame(true);
@@ -1278,16 +1637,14 @@ function renderAll() {
   renderTopBar();
   renderClub();
   renderSquad();
-  renderRecord();
-  renderMatchTeam();
-  document.getElementById("matchLog").innerHTML = `<p class="text-gray-600 italic">Pulsa "Jugar Partido" para simular el encuentro…</p>`;
+  renderTactics();
+  renderCalendar();
+  renderOffice();
+  document.getElementById("matchLog").innerHTML = `<p class="text-gray-600 italic">Pulsa "Jugar Siguiente Partido" para simular el encuentro…</p>`;
   document.getElementById("matchStatusLabel").textContent = "Listo para jugar";
   document.getElementById("matchMinute").classList.add("hidden");
   document.getElementById("scoreHome").textContent = "0";
   document.getElementById("scoreAway").textContent = "0";
-  document.getElementById("playBtn").disabled = false;
-  document.getElementById("playBtn").classList.remove("opacity-40");
-  document.getElementById("playBtn").innerHTML = `<i class="fa-solid fa-play"></i> Jugar Partido`;
 }
 
 /* ============================================================
