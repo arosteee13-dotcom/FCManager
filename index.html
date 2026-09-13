@@ -200,30 +200,66 @@
 
   <!-- PLAYER MODAL -->
   <div id="playerModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-end justify-center">
-    <div class="max-w-md w-full bg-[#15161c] rounded-t-3xl p-5 space-y-4 max-h-[85vh] overflow-y-auto" onclick="event.stopPropagation()">
-      <div class="flex justify-between items-start">
-        <div class="flex items-center gap-3">
-          <div id="modalAvatar" class="w-14 h-14 rounded-full flex items-center justify-center font-black text-lg"></div>
-          <div>
-            <p id="modalName" class="font-bold text-base"></p>
-            <p id="modalSub" class="text-xs text-gray-500"></p>
+    <div class="max-w-md w-full bg-[#15161c] rounded-t-3xl p-5 space-y-5 max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          <div class="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+            <i class="fa-solid fa-user text-xs"></i>
           </div>
+          <p class="font-bold text-sm">Perfil del jugador</p>
         </div>
         <button onclick="closePlayerModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <div class="grid grid-cols-4 gap-2 text-center">
-        <div class="card-sm py-2"><p class="text-[10px] text-gray-500">Edad</p><p id="modalAge" class="font-bold text-sm mt-0.5"></p></div>
-        <div class="card-sm py-2"><p class="text-[10px] text-gray-500">Altura</p><p id="modalHeight" class="font-bold text-sm mt-0.5"></p></div>
-        <div class="card-sm py-2"><p class="text-[10px] text-gray-500">Peso</p><p id="modalWeight" class="font-bold text-sm mt-0.5"></p></div>
-        <div class="card-sm py-2"><p class="text-[10px] text-gray-500">OVR</p><p id="modalOvr" class="font-bold text-sm mt-0.5"></p></div>
+      <div class="flex items-start gap-4">
+        <div class="w-28 h-28 rounded-2xl bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center shrink-0">
+          <i class="fa-solid fa-user text-5xl text-slate-500"></i>
+        </div>
+        <div class="flex-1 pt-1 min-w-0">
+          <p id="modalName" class="font-extrabold text-xl leading-tight truncate"></p>
+          <p class="text-sm text-gray-400 font-semibold mt-1">
+            <span id="modalAge"></span>a. <span class="text-gray-600">|</span>
+            <span id="modalPrimaryPos" class="text-white"></span>
+            <span id="modalOtherPos" class="text-gray-500"></span>
+          </p>
+          <div class="flex gap-6 mt-4">
+            <div>
+              <p class="text-[11px] text-gray-500 font-semibold">General</p>
+              <p id="modalOvr" class="text-3xl font-black mt-0.5"></p>
+            </div>
+            <div>
+              <p class="text-[11px] text-gray-500 font-semibold">Potencial</p>
+              <p id="modalPotential" class="text-3xl font-black mt-0.5 text-gray-600"></p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div class="space-y-2" id="modalStats"></div>
+      <div class="border-t border-white/10 pt-4 grid grid-cols-3 gap-y-4 text-center" id="modalStats"></div>
 
-      <div class="space-y-1.5">
+      <div class="border-t border-white/10 pt-4 grid grid-cols-4 gap-2 text-center">
+        <div>
+          <p class="text-[10px] text-gray-500 font-semibold">Valor</p>
+          <p id="modalValue" class="font-bold text-sm mt-1"></p>
+        </div>
+        <div>
+          <p class="text-[10px] text-gray-500 font-semibold">Salario</p>
+          <p id="modalWage" class="font-bold text-sm mt-1"></p>
+        </div>
+        <div>
+          <p class="text-[10px] text-gray-500 font-semibold">Pie Preferido</p>
+          <p id="modalFoot" class="font-bold text-sm mt-1"></p>
+        </div>
+        <div>
+          <p class="text-[10px] text-gray-500 font-semibold">Cara Real</p>
+          <p class="font-bold text-sm mt-1">No</p>
+        </div>
+      </div>
+
+      <div class="border-t border-white/10 pt-4 space-y-1.5">
         <label class="text-[10px] font-bold text-gray-500 uppercase">Cambiar posición / rol</label>
         <select id="modalPositionSelect" class="w-full bg-[#0f1015] border border-white/10 rounded-lg px-3 py-2.5 text-sm"></select>
       </div>
@@ -378,10 +414,45 @@ function positionCategory(pos) {
 }
 function findPlayer(id) { return state.players.find(p => p.id === id); }
 
+const KNOWN_FEET = {
+  "Balde": "Izquierdo", "Gerard Martín": "Izquierdo", "Raphinha": "Izquierdo",
+  "Lamine Yamal": "Izquierdo", "Anthony Gordon": "Izquierdo", "Jofre Torrents": "Izquierdo",
+  "Pedri": "Derecho", "Gavi": "Derecho", "Ronald Araujo": "Derecho", "Jules Koundé": "Derecho",
+  "F. de Jong": "Derecho", "Fermín": "Derecho", "Dani Olmo": "Derecho", "Marc Casadó": "Derecho",
+  "Marc Bernal": "Derecho", "Pau Cubarsí": "Derecho", "Eric García": "Derecho",
+  "W. Szczęsny": "Derecho", "Joan García": "Derecho", "A. Christensen": "Derecho",
+  "Karim Adeyemi": "Derecho", "Ferran Torres": "Derecho"
+};
+function preferredFoot(player) {
+  if (KNOWN_FEET[player.name]) return KNOWN_FEET[player.name];
+  return hashStr(player.name + "foot") % 5 === 0 ? "Izquierdo" : "Derecho";
+}
+function computePotential(player) {
+  if (player.age > 21) return null;
+  const seed = hashStr(player.name + "potencial");
+  const add = player.age <= 19 ? seededInt(seed, 6, 12) : seededInt(seed, 3, 7);
+  return clamp(player.ovr + add, player.ovr, 94);
+}
+function computeMarketValue(player) {
+  const ageFactor = player.age <= 21 ? 1.6 : player.age <= 24 ? 1.3 : player.age <= 27 ? 1.1 : player.age <= 30 ? 0.8 : 0.15;
+  const base = Math.pow(Math.max(player.ovr - 60, 1), 2) * 0.038;
+  return Math.max(0.3, base * ageFactor);
+}
+function computeWage(player) {
+  return Math.round((player.ovr * player.ovr * 10.25) / 1000) * 1000;
+}
+function statColor(v) {
+  if (v >= 80) return "text-emerald-400";
+  if (v >= 70) return "text-green-400";
+  if (v >= 60) return "text-yellow-400";
+  if (v >= 50) return "text-orange-400";
+  return "text-red-500";
+}
+
 function computeSubStats(player) {
   const bias = {
     "Portero": { ritmo: -25, tiro: -35, pase: -5, regate: -20, defensa: 10, fisico: 5 },
-    "Defensas": { ritmo: -5, tiro: -15, pase: 0, regate: -10, defensa: 15, fisico: 8 },
+    "Defensas": { ritmo: -5, tiro: -15, pase: 0, regate: -10, defensa: 8, fisico: 6 },
     "Centrocampistas": { ritmo: 0, tiro: -5, pase: 12, regate: 5, defensa: -5, fisico: 0 },
     "Delanteros": { ritmo: 8, tiro: 15, pase: -5, regate: 8, defensa: -20, fisico: 3 }
   }[positionCategory(player.position)];
@@ -494,29 +565,30 @@ function openPlayerModal(id) {
   if (!p) return;
   state.currentModalPlayerId = id;
 
-  document.getElementById("modalAvatar").style.background = avatarColor(p.name);
-  document.getElementById("modalAvatar").textContent = initials(p.name);
   document.getElementById("modalName").textContent = p.name;
-  document.getElementById("modalSub").textContent = POSITION_LABELS[p.position] +
-    (p.positions.length > 1 ? " · también: " + p.positions.slice(1).join(", ") : "");
   document.getElementById("modalAge").textContent = p.age;
-  document.getElementById("modalHeight").textContent = p.height + " cm";
-  document.getElementById("modalWeight").textContent = p.weight + " kg";
+  document.getElementById("modalPrimaryPos").textContent = p.position;
+  document.getElementById("modalOtherPos").textContent = p.positions.slice(1).join(" ");
+
   const ovrEl = document.getElementById("modalOvr");
   ovrEl.textContent = p.ovr;
-  ovrEl.className = "font-bold text-sm mt-0.5 rounded " + ovrBadgeClass(p.ovr);
+  ovrEl.className = "text-3xl font-black mt-0.5 " + statColor(p.ovr);
+
+  const potential = computePotential(p);
+  const potEl = document.getElementById("modalPotential");
+  potEl.textContent = potential !== null ? potential : "—";
+  potEl.className = "text-3xl font-black mt-0.5 " + (potential !== null ? statColor(potential) : "text-gray-600");
+
+  document.getElementById("modalValue").textContent = fmtMoney(computeMarketValue(p) * 1_000_000);
+  document.getElementById("modalWage").textContent = fmtMoney(computeWage(p)) + "/sem";
+  document.getElementById("modalFoot").textContent = preferredFoot(p);
 
   const stats = computeSubStats(p);
-  const labels = { ritmo: "Ritmo", tiro: "Tiro", pase: "Pase", regate: "Regate", defensa: "Defensa", fisico: "Físico" };
+  const labels = { ritmo: "RIT", tiro: "TIR", pase: "PAS", regate: "REG", defensa: "DEF", fisico: "FÍS" };
   document.getElementById("modalStats").innerHTML = Object.entries(stats).map(([k, v]) => `
     <div>
-      <div class="flex justify-between text-[11px] mb-1">
-        <span class="text-gray-400 font-semibold">${labels[k]}</span>
-        <span class="font-bold">${v}</span>
-      </div>
-      <div class="h-1.5 rounded-full bg-white/10 overflow-hidden">
-        <div class="h-full rounded-full statbar-fill ${v >= 80 ? 'bg-emerald-500' : v >= 65 ? 'bg-yellow-400' : 'bg-orange-500'}" style="width:${v}%"></div>
-      </div>
+      <p class="text-[11px] text-gray-500 font-semibold">${labels[k]}</p>
+      <p class="text-xl font-black mt-0.5 ${statColor(v)}">${v}</p>
     </div>
   `).join("");
 
