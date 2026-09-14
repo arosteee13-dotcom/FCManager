@@ -6,22 +6,72 @@
 <title>FC Manager · Landscape</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  * { -webkit-tap-highlight-color: transparent; }
-  html, body { background:#0b0c10; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  * { -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  html, body { background:#090a0d; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .font-display { font-family: 'Rajdhani', 'Inter', sans-serif; letter-spacing: .015em; }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-thumb { background: #2a2e38; border-radius: 4px; }
   .no-scrollbar::-webkit-scrollbar { display:none; }
-  .card { background:#1f2833; border-radius:16px; }
-  .card-sm { background:#242a35; border-radius:12px; }
-  .fade-in { animation: fadeIn .2s ease-out; }
-  @keyframes fadeIn { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
-  .side-link { color:#8a93a3; }
-  .side-link.active { background:#10b981; color:#04150f; }
-  .side-link:not(.active):hover { background:#1f2833; color:#fff; }
-  .tab-pill { background:#242a35; color:#9ca3af; }
-  .tab-pill.active { background:#10b981; color:#04150f; }
+
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: -1;
+    background:
+      radial-gradient(1100px 550px at 12% -8%, rgba(16,185,129,.11), transparent 60%),
+      radial-gradient(900px 500px at 105% 0%, rgba(56,130,246,.09), transparent 55%),
+      #090a0d;
+  }
+
+  .card {
+    background: linear-gradient(160deg, #1b212b, #131820);
+    border: 1px solid rgba(255,255,255,.06);
+    border-radius: 18px;
+    box-shadow: 0 14px 30px -12px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.035);
+  }
+  .card-sm {
+    background: linear-gradient(160deg, #1f2530, #171b22);
+    border: 1px solid rgba(255,255,255,.05);
+    border-radius: 13px;
+  }
+  .fade-in { animation: fadeIn .25s ease-out; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .side-link { color:#7c8494; }
+  .side-link.active {
+    background: linear-gradient(90deg, rgba(16,185,129,.20), rgba(16,185,129,.02));
+    color:#fff;
+    box-shadow: inset 3px 0 0 0 #10b981;
+  }
+  .side-link:not(.active):hover { background: rgba(255,255,255,.045); color:#e5e7eb; }
+
+  .tab-pill { background:#1b212b; color:#8a93a3; border:1px solid rgba(255,255,255,.05); }
+  .tab-pill.active {
+    background: linear-gradient(135deg,#22e39a,#0ea975);
+    color:#04150f; border-color: transparent;
+    box-shadow: 0 4px 14px -4px rgba(16,185,129,.6);
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg,#22e39a,#0ea975);
+    box-shadow: 0 6px 18px -6px rgba(16,185,129,.65), inset 0 1px 0 rgba(255,255,255,.3);
+    color: #04150f;
+  }
+  .btn-primary:hover { filter: brightness(1.07); }
+  .btn-primary:active { transform: translateY(1px) scale(.98); }
+
+  .chip {
+    box-shadow: 0 4px 12px -3px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.28), inset 0 -6px 10px rgba(0,0,0,.22);
+    border: 1px solid rgba(255,255,255,.16);
+  }
+  .badge {
+    box-shadow: 0 2px 6px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.3);
+    border: 1px solid rgba(255,255,255,.18);
+  }
+
   .pulse-live { animation: pulseLive 1.4s infinite; }
   @keyframes pulseLive { 0%,100%{opacity:1;} 50%{opacity:.35;} }
   #rotateWarning { display:none; }
@@ -29,7 +79,15 @@
     #rotateWarning { display:flex; }
     #appShell { display:none !important; }
   }
-  .pitch-token { transition: left .3s ease, top .3s ease; }
+
+  .pitch-token { transition: left .3s ease, top .3s ease, transform .15s ease; }
+  .pitch-token:hover { transform: translate(-50%,-50%) scale(1.08); z-index: 10; }
+  .pitch-grass {
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 2px, transparent 2px 44px),
+      linear-gradient(90deg, #0b3a24, #10502f 45%, #0b3a24);
+  }
+  select { color-scheme: dark; }
 </style>
 </head>
 <body class="bg-[#0b0c10] text-white">
@@ -46,17 +104,17 @@
        PANTALLA: SELECCIÓN DE CLUB
        ============================================================ -->
   <div id="screen-select" class="w-full h-screen flex flex-col">
-    <header class="px-8 py-4 border-b border-white/5 flex items-center gap-3 shrink-0">
-      <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center shrink-0"><i class="fa-solid fa-futbol text-black"></i></div>
+    <header class="px-8 py-4 border-b border-white/5 flex items-center gap-3 shrink-0 bg-black/20">
+      <div class="w-11 h-11 rounded-xl btn-primary flex items-center justify-center shrink-0"><i class="fa-solid fa-futbol text-lg"></i></div>
       <div>
-        <h1 class="font-extrabold text-lg leading-tight">FC MANAGER</h1>
+        <h1 class="font-display font-bold text-xl leading-tight tracking-wide">FC MANAGER</h1>
         <p class="text-[11px] text-gray-500">Elige liga y club para comenzar tu carrera</p>
       </div>
     </header>
     <div class="flex-1 flex min-h-0">
-      <div class="w-52 border-r border-white/5 p-3 space-y-1 overflow-y-auto shrink-0" id="selectCountryRail"></div>
+      <div class="w-52 border-r border-white/5 p-3 space-y-1 overflow-y-auto shrink-0 bg-black/10" id="selectCountryRail"></div>
       <div class="flex-1 p-5 overflow-y-auto" id="selectClubList"></div>
-      <div class="w-80 border-l border-white/5 p-5 shrink-0 overflow-y-auto" id="selectClubDetail">
+      <div class="w-80 border-l border-white/5 p-5 shrink-0 overflow-y-auto bg-black/10" id="selectClubDetail">
         <div class="h-full flex flex-col items-center justify-center text-center text-gray-600 gap-2">
           <i class="fa-solid fa-shield-halved text-3xl"></i>
           <p class="text-xs">Selecciona un club para ver sus detalles</p>
@@ -71,31 +129,31 @@
   <div id="screen-game" class="hidden w-full h-screen flex">
 
     <!-- SIDEBAR -->
-    <aside class="w-16 lg:w-56 bg-[#12141a] border-r border-white/5 flex flex-col shrink-0">
+    <aside class="w-16 lg:w-56 bg-gradient-to-b from-[#12151c] to-[#0d0f14] border-r border-white/5 flex flex-col shrink-0">
       <div class="p-3 lg:p-4 flex items-center gap-2.5 border-b border-white/5">
-        <div id="sidebarCrest" class="w-9 h-9 rounded-lg flex items-center justify-center font-black text-[10px] shrink-0">FCB</div>
+        <div id="sidebarCrest" class="w-9 h-9 rounded-lg chip flex items-center justify-center font-display font-bold text-[10px] shrink-0">FCB</div>
         <div class="hidden lg:block min-w-0">
           <p id="sidebarClubName" class="font-bold text-xs truncate">—</p>
           <p id="sidebarLeague" class="text-[10px] text-gray-500 truncate">—</p>
         </div>
       </div>
       <nav class="flex-1 py-3 px-2 space-y-1" id="sidebarNav"></nav>
-      <button onclick="confirmExit()" class="m-2 py-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] font-bold flex items-center justify-center gap-2 text-red-400">
+      <button onclick="confirmExit()" class="m-2 py-2.5 rounded-lg bg-white/5 hover:bg-red-500/10 text-[11px] font-bold flex items-center justify-center gap-2 text-red-400 transition">
         <i class="fa-solid fa-right-from-bracket"></i><span class="hidden lg:inline">Salir</span>
       </button>
     </aside>
 
     <div class="flex-1 flex flex-col min-w-0">
       <!-- TOP HEADER -->
-      <header class="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-5 lg:px-7 bg-[#0b0c10]/80">
+      <header class="h-16 shrink-0 border-b border-white/5 flex items-center justify-between px-5 lg:px-7 bg-[#0b0c10]/85 backdrop-blur">
         <div class="min-w-0">
-          <p id="viewTitle" class="font-extrabold text-base lg:text-lg leading-tight">Dashboard</p>
+          <p id="viewTitle" class="font-display font-bold text-base lg:text-lg leading-tight tracking-wide">Dashboard</p>
           <p id="gameDate" class="text-[11px] text-gray-500 leading-tight">—</p>
         </div>
-        <div class="flex items-center gap-3 lg:gap-5 shrink-0">
-          <div class="hidden sm:flex items-center gap-1.5 text-sm font-bold text-amber-400"><i class="fa-solid fa-coins"></i><span id="hdrCoins">—</span></div>
-          <div class="flex items-center gap-1.5 text-sm font-bold text-emerald-400"><i class="fa-solid fa-sack-dollar"></i><span id="hdrMoney">—</span></div>
-          <button id="continueBtn" onclick="advanceToNextMatch()" class="bg-emerald-500 hover:bg-emerald-400 text-black font-bold text-xs lg:text-sm px-4 lg:px-5 py-2.5 rounded-xl flex items-center gap-2 transition active:scale-95">
+        <div class="flex items-center gap-2 lg:gap-3 shrink-0">
+          <div class="hidden sm:flex items-center gap-1.5 text-sm font-bold text-amber-300 bg-amber-400/10 border border-amber-400/20 rounded-full px-3 py-1.5"><i class="fa-solid fa-coins"></i><span id="hdrCoins">—</span></div>
+          <div class="flex items-center gap-1.5 text-sm font-bold text-emerald-300 bg-emerald-400/10 border border-emerald-400/20 rounded-full px-3 py-1.5"><i class="fa-solid fa-sack-dollar"></i><span id="hdrMoney">—</span></div>
+          <button id="continueBtn" onclick="advanceToNextMatch()" class="btn-primary font-bold text-xs lg:text-sm px-4 lg:px-5 py-2.5 rounded-xl flex items-center gap-2 transition active:scale-95">
             <i class="fa-solid fa-forward"></i> <span class="hidden sm:inline">Continuar</span>
           </button>
         </div>
@@ -131,7 +189,15 @@
               <p class="font-bold text-sm">Alineación titular</p>
               <div class="flex gap-1.5" id="formationTabs"></div>
             </div>
-            <div id="pitchViewH" class="relative flex-1 rounded-xl bg-gradient-to-r from-emerald-900/40 to-emerald-950/60 border border-emerald-500/20 overflow-hidden min-h-[380px]"></div>
+            <div id="pitchViewH" class="pitch-grass relative flex-1 rounded-xl border border-emerald-500/25 shadow-inner overflow-hidden min-h-[380px]">
+              <div class="absolute inset-3 border-2 border-white/15 rounded-md pointer-events-none"></div>
+              <div class="absolute top-1/2 left-3 right-3 border-t-2 border-white/15 pointer-events-none"></div>
+              <div class="absolute top-1/2 left-1/2 w-24 h-24 -translate-x-1/2 -translate-y-1/2 border-2 border-white/15 rounded-full pointer-events-none"></div>
+              <div class="absolute top-1/2 left-1/2 w-1.5 h-1.5 -translate-x-1/2 -translate-y-1/2 bg-white/25 rounded-full pointer-events-none"></div>
+              <div class="absolute top-1/2 left-3 w-14 h-28 -translate-y-1/2 border-2 border-white/15 border-l-0 rounded-r-md pointer-events-none"></div>
+              <div class="absolute top-1/2 right-3 w-14 h-28 -translate-y-1/2 border-2 border-white/15 border-r-0 rounded-l-md pointer-events-none"></div>
+              <div id="pitchTokens" class="absolute inset-0"></div>
+            </div>
             <p class="text-[10px] text-gray-500 mt-2"><i class="fa-solid fa-circle-info mr-1"></i>Selecciona un suplente y luego pulsa sobre una posición del campo para hacer el cambio.</p>
           </div>
           <div class="col-span-3 lg:col-span-1 card p-4 flex flex-col min-h-0">
@@ -160,23 +226,23 @@
         <!-- TRASPASOS Y FINANZAS -->
         <section id="view-transfers" class="hidden fade-in space-y-5">
           <div class="grid grid-cols-3 gap-4">
-            <div class="card p-4">
-              <p class="text-[10px] text-gray-500 uppercase font-bold">Presupuesto</p>
-              <p id="txMoney" class="font-black text-emerald-400 text-lg mt-0.5">—</p>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-sack-dollar text-sm"></i></div>
+              <div class="min-w-0"><p class="text-[10px] text-gray-500 uppercase font-bold">Presupuesto</p><p id="txMoney" class="font-display font-bold text-emerald-400 text-lg leading-tight">—</p></div>
             </div>
-            <div class="card p-4">
-              <p class="text-[10px] text-gray-500 uppercase font-bold">Masa salarial / sem.</p>
-              <p id="txWageBill" class="font-black text-sm mt-0.5">—</p>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-orange-500/15 text-orange-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-money-check-dollar text-sm"></i></div>
+              <div class="min-w-0"><p class="text-[10px] text-gray-500 uppercase font-bold">Masa salarial / sem.</p><p id="txWageBill" class="font-display font-bold text-sm leading-tight">—</p></div>
             </div>
-            <div class="card p-4">
-              <p class="text-[10px] text-gray-500 uppercase font-bold">Ingresos por jornada</p>
-              <p id="txIncome" class="font-black text-sm mt-0.5">—</p>
+            <div class="card p-4 flex items-center gap-3">
+              <div class="w-9 h-9 rounded-lg bg-blue-500/15 text-blue-400 flex items-center justify-center shrink-0"><i class="fa-solid fa-ticket text-sm"></i></div>
+              <div class="min-w-0"><p class="text-[10px] text-gray-500 uppercase font-bold">Ingresos por jornada</p><p id="txIncome" class="font-display font-bold text-sm leading-tight">—</p></div>
             </div>
           </div>
           <div class="space-y-2">
             <div class="flex items-center justify-between px-1">
               <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">Mercado de fichajes</p>
-              <button onclick="refreshMarket()" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg font-semibold flex items-center gap-1.5">
+              <button onclick="refreshMarket()" class="text-xs bg-white/5 hover:bg-white/10 px-3 py-2 rounded-lg font-semibold flex items-center gap-1.5 transition">
                 <i class="fa-solid fa-rotate"></i> Actualizar
               </button>
             </div>
@@ -188,8 +254,8 @@
   </div>
 
   <!-- MODAL: PERFIL DE JUGADOR -->
-  <div id="playerModal" class="hidden fixed inset-0 z-50 bg-black/70 flex items-center justify-center px-4">
-    <div class="max-w-sm w-full bg-[#171b22] rounded-3xl p-5 space-y-5 max-h-[88vh] overflow-y-auto" onclick="event.stopPropagation()">
+  <div id="playerModal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center px-4">
+    <div class="max-w-sm w-full bg-gradient-to-b from-[#1b212b] to-[#12151b] border border-white/10 rounded-3xl p-5 space-y-5 max-h-[88vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5">
           <div class="w-8 h-8 rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
@@ -197,12 +263,12 @@
           </div>
           <p class="font-bold text-sm">Perfil del jugador</p>
         </div>
-        <button onclick="closePlayerModal()" class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-gray-400">
+        <button onclick="closePlayerModal()" class="w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 transition">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
       <div class="flex items-start gap-4">
-        <div class="w-24 h-24 rounded-2xl bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center shrink-0">
+        <div class="w-24 h-24 rounded-2xl chip bg-gradient-to-b from-slate-700 to-slate-900 flex items-center justify-center shrink-0">
           <i class="fa-solid fa-user text-4xl text-slate-500"></i>
         </div>
         <div class="flex-1 pt-1 min-w-0">
@@ -212,8 +278,8 @@
             <span id="modalPrimaryPos" class="text-white"></span> <span id="modalOtherPos" class="text-gray-500"></span>
           </p>
           <div class="flex gap-6 mt-3">
-            <div><p class="text-[10px] text-gray-500 font-semibold">General</p><p id="modalOvr" class="text-2xl font-black mt-0.5"></p></div>
-            <div><p class="text-[10px] text-gray-500 font-semibold">Salud</p><p id="modalHealth" class="text-2xl font-black mt-0.5"></p></div>
+            <div><p class="text-[10px] text-gray-500 font-semibold">General</p><p id="modalOvr" class="font-display text-2xl font-bold mt-0.5"></p></div>
+            <div><p class="text-[10px] text-gray-500 font-semibold">Salud</p><p id="modalHealth" class="font-display text-2xl font-bold mt-0.5"></p></div>
             <div><p class="text-[10px] text-gray-500 font-semibold">Moral</p><p id="modalMorale" class="text-2xl mt-0.5"></p></div>
           </div>
         </div>
@@ -229,29 +295,29 @@
         <label class="text-[10px] font-bold text-gray-500 uppercase">Cambiar posición / rol</label>
         <select id="modalPositionSelect" class="w-full bg-[#0b0c10] border border-white/10 rounded-lg px-3 py-2.5 text-sm"></select>
       </div>
-      <button onclick="savePlayerPosition()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2.5 rounded-xl text-sm">Guardar cambios</button>
+      <button onclick="savePlayerPosition()" class="btn-primary w-full font-bold py-2.5 rounded-xl text-sm transition">Guardar cambios</button>
     </div>
   </div>
 
   <!-- MODAL: RESULTADO DE PARTIDO -->
   <div id="resultModal" class="hidden fixed inset-0 z-50 bg-black/75 flex items-center justify-center px-4">
-    <div class="max-w-sm w-full bg-[#171b22] rounded-3xl p-6 space-y-4" onclick="event.stopPropagation()">
+    <div class="max-w-sm w-full bg-gradient-to-b from-[#1b212b] to-[#12151b] border border-white/10 rounded-3xl p-6 space-y-4 shadow-2xl" onclick="event.stopPropagation()">
       <p class="text-center text-[10px] font-bold uppercase tracking-wide text-gray-500" id="resultRound"></p>
       <div class="flex items-center justify-center gap-4">
         <div class="text-center flex-1">
-          <div id="resultCrestHome" class="w-14 h-14 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black"></div>
+          <div id="resultCrestHome" class="w-14 h-14 mx-auto rounded-xl chip flex items-center justify-center text-[10px] font-black"></div>
           <p id="resultNameHome" class="text-xs font-bold mt-1.5 truncate"></p>
         </div>
-        <div class="flex items-center gap-2 text-3xl font-black shrink-0">
-          <span id="resultGh"></span><span class="text-gray-600 text-lg">-</span><span id="resultGa"></span>
+        <div class="flex items-center gap-2 text-4xl font-display font-bold shrink-0">
+          <span id="resultGh"></span><span class="text-gray-600 text-xl">-</span><span id="resultGa"></span>
         </div>
         <div class="text-center flex-1">
-          <div id="resultCrestAway" class="w-14 h-14 mx-auto rounded-xl flex items-center justify-center text-[10px] font-black bg-slate-700"></div>
+          <div id="resultCrestAway" class="w-14 h-14 mx-auto rounded-xl chip flex items-center justify-center text-[10px] font-black bg-slate-700"></div>
           <p id="resultNameAway" class="text-xs font-bold mt-1.5 truncate"></p>
         </div>
       </div>
       <div id="resultEvents" class="space-y-1.5 max-h-40 overflow-y-auto text-xs text-gray-300 border-t border-white/10 pt-3"></div>
-      <button onclick="closeResultModal()" class="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-2.5 rounded-xl text-sm">Continuar</button>
+      <button onclick="closeResultModal()" class="btn-primary w-full font-bold py-2.5 rounded-xl text-sm transition">Continuar</button>
     </div>
   </div>
 
@@ -413,11 +479,12 @@ function fmtMoney(v) {
   return v + "€";
 }
 function ovrBadgeClass(ovr) {
-  if (ovr >= 85) return "bg-emerald-500 text-black";
-  if (ovr >= 80) return "bg-green-500 text-black";
-  if (ovr >= 75) return "bg-yellow-400 text-black";
-  if (ovr >= 70) return "bg-orange-400 text-black";
-  return "bg-red-500 text-white";
+  const base = "badge font-display ";
+  if (ovr >= 85) return base + "bg-gradient-to-b from-emerald-400 to-emerald-600 text-black";
+  if (ovr >= 80) return base + "bg-gradient-to-b from-green-400 to-green-600 text-black";
+  if (ovr >= 75) return base + "bg-gradient-to-b from-yellow-300 to-yellow-500 text-black";
+  if (ovr >= 70) return base + "bg-gradient-to-b from-orange-300 to-orange-500 text-black";
+  return base + "bg-gradient-to-b from-red-400 to-red-600 text-white";
 }
 function avatarColor(name) { return `hsl(${hashStr(name) % 360}, 55%, 42%)`; }
 function initials(name) { return name.split(" ").map(p => p[0]).slice(0, 2).join("").toUpperCase(); }
@@ -658,17 +725,17 @@ function ratingRingSVG(rating) {
   const pct = clamp(rating / 99, 0, 1);
   const offset = c * (1 - pct);
   const color = rating >= 85 ? "#10b981" : rating >= 80 ? "#22c55e" : rating >= 75 ? "#eab308" : rating >= 70 ? "#f97316" : "#ef4444";
-  return `<svg width="120" height="120" viewBox="0 0 100 100" class="mx-auto">
+  return `<svg width="120" height="120" viewBox="0 0 100 100" class="mx-auto drop-shadow-[0_4px_10px_rgba(0,0,0,.5)]">
     <circle cx="50" cy="50" r="${r}" fill="none" stroke="#242a35" stroke-width="8"/>
     <circle cx="50" cy="50" r="${r}" fill="none" stroke="${color}" stroke-width="8" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${offset}" transform="rotate(-90 50 50)"/>
-    <text x="50" y="46" text-anchor="middle" font-size="24" font-weight="900" fill="#fff">${rating}</text>
-    <text x="50" y="63" text-anchor="middle" font-size="9" fill="#9ca3af">MEDIA</text>
+    <text x="50" y="47" text-anchor="middle" font-size="26" font-weight="700" font-family="Rajdhani,sans-serif" fill="#fff">${rating}</text>
+    <text x="50" y="63" text-anchor="middle" font-size="9" letter-spacing="1" fill="#9ca3af">MEDIA</text>
   </svg>`;
 }
 function renderSelectScreen() {
   const rail = document.getElementById("selectCountryRail");
   rail.innerHTML = Object.keys(COUNTRIES).map(name => `
-    <button onclick="selectCountry('${name}')" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition ${state.selectedCountry === name ? "bg-emerald-500 text-black" : "text-gray-400 hover:bg-white/5"}">
+    <button onclick="selectCountry('${name}')" class="w-full text-left px-3 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition ${state.selectedCountry === name ? "btn-primary" : "text-gray-400 hover:bg-white/5"}">
       <span class="text-base">${COUNTRIES[name].flag}</span> ${name}
     </button>
   `).join("");
@@ -684,7 +751,7 @@ function selectCountry(name, silent) {
     <div class="grid grid-cols-2 gap-2.5">
       ${clubs.map((c, i) => `
         <button onclick="selectClub(${i})" id="clubRow-${i}" class="card-sm p-3 flex items-center gap-3 text-left transition hover:bg-white/5">
-          <div class="w-10 h-10 rounded-lg flex items-center justify-center font-black text-[10px] shrink-0" style="background:${crestGradient(c)}">${c.tag}</div>
+          <div class="w-10 h-10 rounded-lg chip flex items-center justify-center font-black text-[10px] shrink-0" style="background:${crestGradient(c)}">${c.tag}</div>
           <div class="flex-1 min-w-0">
             <p class="font-bold text-xs truncate">${c.name}${c.real ? " ⭐" : ""}</p>
             <p class="text-[10px] text-gray-500">Plantilla ${c.real ? "real" : "generada"}</p>
@@ -708,7 +775,7 @@ function selectClub(index) {
   document.getElementById("clubRow-" + index).classList.add("ring-2", "ring-emerald-400");
   const isReal = !!club.real;
   document.getElementById("selectClubDetail").innerHTML = `
-    <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center font-black text-lg mb-3" style="background:${crestGradient(club)}">${club.tag}</div>
+    <div class="w-16 h-16 rounded-2xl mx-auto chip flex items-center justify-center font-display font-bold text-lg mb-3" style="background:${crestGradient(club)}">${club.tag}</div>
     <h3 class="text-center font-extrabold text-base">${club.name}</h3>
     <p class="text-center text-[11px] text-gray-500 mb-3">${leagueName} · ${state.selectedCountry}</p>
     ${ratingRingSVG(club.rating)}
@@ -717,7 +784,7 @@ function selectClub(index) {
       <div class="card-sm p-3 flex items-center justify-between"><span class="text-gray-500">Capacidad</span><span class="font-semibold">${(isReal ? 99354 : 20000 + club.rating * 600).toLocaleString("es-ES")}</span></div>
       <div class="card-sm p-3 flex items-center justify-between"><span class="text-gray-500">Presupuesto</span><span class="font-semibold text-emerald-400">${fmtMoney(club.rating * 500000 + 5000000)}</span></div>
     </div>
-    <button onclick="startCareer()" class="w-full mt-4 bg-emerald-500 hover:bg-emerald-400 text-black font-bold py-3 rounded-xl text-sm transition active:scale-[0.98]">
+    <button onclick="startCareer()" class="btn-primary w-full mt-4 font-bold py-3 rounded-xl text-sm transition active:scale-[0.98]">
       <i class="fa-solid fa-play mr-1.5"></i> Comenzar carrera
     </button>`;
 }
@@ -780,8 +847,8 @@ const NAV_ITEMS = [
 ];
 function buildSidebarNav() {
   document.getElementById("sidebarNav").innerHTML = NAV_ITEMS.map(item => `
-    <button data-view="${item.id}" onclick="switchView('${item.id}')" class="side-link w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-xs font-bold transition">
-      <i class="fa-solid ${item.icon} w-4 text-center"></i><span class="hidden lg:inline">${item.label}</span>
+    <button data-view="${item.id}" onclick="switchView('${item.id}')" class="side-link w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition">
+      <i class="fa-solid ${item.icon} w-4 text-center text-sm"></i><span class="hidden lg:inline">${item.label}</span>
     </button>
   `).join("");
 }
@@ -833,6 +900,12 @@ function addNews(text) {
   state.news.unshift({ text, time: fmtDate(state.currentDate) });
   state.news = state.news.slice(0, 8);
 }
+function widgetTitle(icon, text, accent) {
+  return `<div class="flex items-center gap-2 mb-3.5">
+    <div class="w-6 h-6 rounded-md ${accent || "bg-emerald-500/15 text-emerald-400"} flex items-center justify-center"><i class="fa-solid ${icon} text-[10px]"></i></div>
+    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">${text}</p>
+  </div>`;
+}
 function renderDashboard() {
   const fixture = state.season.userFixtures.find(f => !f.played);
   const wrap = document.getElementById("widgetNextMatch");
@@ -840,33 +913,35 @@ function renderDashboard() {
     const oppInfo = leagueClubs(state.club).find(c => c.name === fixture.opponent);
     const matchDate = addDays(state.season.startDate, fixture.round * 7);
     wrap.innerHTML = `
-      <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3">Próximo partido · Jornada ${fixture.round + 1}</p>
+      ${widgetTitle("fa-futbol", "Próximo partido · Jornada " + (fixture.round + 1))}
       <div class="flex items-center justify-between">
         <div class="text-center flex-1">
-          <div class="w-14 h-14 mx-auto rounded-xl flex items-center justify-center font-black text-xs" style="background:${crestGradient(state.club)}">${state.club.tag}</div>
+          <div class="w-16 h-16 mx-auto rounded-2xl chip flex items-center justify-center font-display font-bold text-sm" style="background:${crestGradient(state.club)}">${state.club.tag}</div>
           <p class="text-xs font-bold mt-2 truncate">${state.club.name}</p>
         </div>
-        <p class="text-gray-500 font-black text-lg px-4">VS</p>
+        <div class="text-center px-4">
+          <p class="font-display font-bold text-2xl text-gray-500">VS</p>
+        </div>
         <div class="text-center flex-1">
-          <div class="w-14 h-14 mx-auto rounded-xl flex items-center justify-center font-black text-xs" style="background:${oppInfo ? crestGradient(oppInfo) : "#374151"}">${oppInfo ? oppInfo.tag : "RIV"}</div>
+          <div class="w-16 h-16 mx-auto rounded-2xl chip flex items-center justify-center font-display font-bold text-sm" style="background:${oppInfo ? crestGradient(oppInfo) : "#374151"}">${oppInfo ? oppInfo.tag : "RIV"}</div>
           <p class="text-xs font-bold mt-2 truncate">${fixture.opponent}</p>
         </div>
       </div>
-      <div class="flex items-center justify-center gap-4 mt-4 text-[11px] text-gray-400">
-        <span><i class="fa-solid fa-calendar mr-1.5"></i>${fmtDate(matchDate)}</span>
-        <span><i class="fa-solid fa-location-dot mr-1.5"></i>${fixture.home ? state.club.stadiumName : "Fuera de casa"}</span>
+      <div class="flex items-center justify-center gap-4 mt-4 text-[11px] text-gray-400 border-t border-white/5 pt-3.5">
+        <span><i class="fa-solid fa-calendar mr-1.5 text-emerald-400"></i>${fmtDate(matchDate)}</span>
+        <span><i class="fa-solid fa-location-dot mr-1.5 text-emerald-400"></i>${fixture.home ? state.club.stadiumName : "Fuera de casa"}</span>
       </div>`;
   } else {
-    wrap.innerHTML = `<p class="text-center text-sm text-gray-500 py-6"><i class="fa-solid fa-trophy mr-2"></i>Temporada finalizada</p>`;
+    wrap.innerHTML = `<p class="text-center text-sm text-gray-500 py-6"><i class="fa-solid fa-trophy mr-2 text-amber-400"></i>Temporada finalizada</p>`;
   }
 
   document.getElementById("widgetNews").innerHTML = `
-    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3"><i class="fa-solid fa-envelope mr-1.5"></i>Bandeja de entrada</p>
+    ${widgetTitle("fa-envelope", "Bandeja de entrada", "bg-blue-500/15 text-blue-400")}
     <div class="flex-1 overflow-y-auto space-y-2.5 pr-1">
       ${state.news.map(n => `
-        <div class="card-sm p-2.5">
+        <div class="card-sm p-3 border-l-2 border-l-emerald-500/40">
           <p class="text-xs leading-snug">${n.text}</p>
-          <p class="text-[10px] text-gray-600 mt-1">${n.time}</p>
+          <p class="text-[10px] text-gray-600 mt-1.5">${n.time}</p>
         </div>
       `).join("")}
     </div>`;
@@ -875,11 +950,11 @@ function renderDashboard() {
   rows.sort((a, b) => b.points - a.points || b.dg - a.dg);
   const myPos = rows.findIndex(r => r.name === state.club.name) + 1;
   document.getElementById("widgetStandings").innerHTML = `
-    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3">Clasificación</p>
-    <div class="space-y-1.5">
+    ${widgetTitle("fa-ranking-star", "Clasificación", "bg-purple-500/15 text-purple-400")}
+    <div class="space-y-2">
       ${rows.slice(0, 5).map((r, i) => `
         <div class="flex items-center justify-between text-xs ${r.name === state.club.name ? "text-emerald-400 font-bold" : "text-gray-400"}">
-          <span class="w-5">${i + 1}</span><span class="flex-1 truncate">${r.name}</span><span class="font-black">${r.points}</span>
+          <span class="w-5 font-display">${i + 1}</span><span class="flex-1 truncate">${r.name}</span><span class="font-display font-bold">${r.points}</span>
         </div>
       `).join("")}
     </div>`;
@@ -887,14 +962,14 @@ function renderDashboard() {
   const best = [...state.players].sort((a, b) => b.ovr - a.ovr)[0];
   const objective = myPos <= 4 ? { label: "Clasificación europea", pct: 80, color: "bg-emerald-500" } : myPos <= (rows.length - 3) ? { label: "Permanencia encarrilada", pct: 55, color: "bg-yellow-400" } : { label: "Zona de descenso", pct: 25, color: "bg-red-500" };
   document.getElementById("widgetSpotlight").innerHTML = `
-    <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mb-3">Jugador en foco</p>
+    ${widgetTitle("fa-star", "Jugador en foco", "bg-amber-500/15 text-amber-400")}
     <div class="flex items-center gap-3">
-      <div class="w-12 h-12 rounded-full flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(best.name)}">${initials(best.name)}</div>
+      <div class="w-12 h-12 rounded-full chip flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(best.name)}">${initials(best.name)}</div>
       <div class="min-w-0">
         <p class="font-bold text-sm truncate">${best.name}</p>
         <p class="text-[10px] text-gray-500">${POSITION_LABELS[best.position]}</p>
       </div>
-      <span class="ml-auto text-sm font-black px-2 py-1 rounded ${ovrBadgeClass(best.ovr)}">${best.ovr}</span>
+      <span class="ml-auto text-sm px-2 py-1 rounded ${ovrBadgeClass(best.ovr)}">${best.ovr}</span>
     </div>
     <p class="text-[10px] font-bold text-gray-500 uppercase tracking-wide mt-4 mb-1.5">Objetivo de temporada</p>
     <p class="text-xs font-semibold mb-1.5">${objective.label} (${myPos}º)</p>
@@ -926,30 +1001,30 @@ function renderSquadScreen() {
   }
   table.innerHTML = `
     <thead>
-      <tr class="text-gray-500 text-left text-[10px] uppercase">
-        <th class="py-2 pr-2">Pos</th><th class="py-2 pr-2"></th><th class="py-2 pr-2">Jugador</th>
-        <th class="py-2 px-2 text-center">OVR</th><th class="py-2 px-2 text-center">POT</th>
-        <th class="py-2 px-2 text-center">Edad</th><th class="py-2 px-2 text-center">Valor</th>
-        <th class="py-2 px-2 text-center">Salud</th><th class="py-2 pl-2 text-center">Moral</th>
+      <tr class="text-gray-500 text-left text-[10px] uppercase border-b border-white/10">
+        <th class="py-3 pr-2">Pos</th><th class="py-3 pr-2"></th><th class="py-3 pr-2">Jugador</th>
+        <th class="py-3 px-2 text-center">OVR</th><th class="py-3 px-2 text-center">POT</th>
+        <th class="py-3 px-2 text-center">Edad</th><th class="py-3 px-2 text-center">Valor</th>
+        <th class="py-3 px-2 text-center">Salud</th><th class="py-3 pl-2 text-center">Moral</th>
       </tr>
     </thead>
     <tbody>
-      ${list.map(p => {
+      ${list.map((p, i) => {
         const face = moraleFace(p.chemistry);
         return `
-        <tr class="border-t border-white/5 hover:bg-white/5 cursor-pointer" onclick="openPlayerModal('${p.id}')">
-          <td class="py-2 pr-2"><span class="text-[10px] font-black px-1.5 py-0.5 rounded ${positionZoneClass(p.position)}">${p.position}</span></td>
-          <td class="py-2 pr-2 text-base">${nationOf(p).flag}</td>
-          <td class="py-2 pr-2 font-semibold truncate max-w-[160px]">${p.name}</td>
-          <td class="py-2 px-2 text-center"><span class="text-[11px] font-black px-1.5 py-0.5 rounded ${ovrBadgeClass(p.ovr)}">${p.ovr}</span></td>
-          <td class="py-2 px-2 text-center text-gray-500">-</td>
-          <td class="py-2 px-2 text-center text-gray-400">${p.age}</td>
-          <td class="py-2 px-2 text-center text-gray-400">${fmtMoney(computeMarketValue(p) * 1_000_000)}</td>
-          <td class="py-2 px-2 text-center text-gray-400">${p.health}%</td>
-          <td class="py-2 pl-2 text-center">
+        <tr class="border-b border-white/5 hover:bg-emerald-500/[.06] cursor-pointer transition ${i % 2 ? "bg-white/[.015]" : ""}" onclick="openPlayerModal('${p.id}')">
+          <td class="py-2.5 pr-2"><span class="text-[10px] font-black px-1.5 py-0.5 rounded-md ${positionZoneClass(p.position)}">${p.position}</span></td>
+          <td class="py-2.5 pr-2 text-base">${nationOf(p).flag}</td>
+          <td class="py-2.5 pr-2 font-semibold truncate max-w-[160px]">${p.name}</td>
+          <td class="py-2.5 px-2 text-center"><span class="text-[11px] px-1.5 py-0.5 rounded-md ${ovrBadgeClass(p.ovr)}">${p.ovr}</span></td>
+          <td class="py-2.5 px-2 text-center text-gray-500">-</td>
+          <td class="py-2.5 px-2 text-center text-gray-400">${p.age}</td>
+          <td class="py-2.5 px-2 text-center text-gray-400">${fmtMoney(computeMarketValue(p) * 1_000_000)}</td>
+          <td class="py-2.5 px-2 text-center text-gray-400">${p.health}%</td>
+          <td class="py-2.5 pl-2 text-center">
             <div class="flex items-center justify-center gap-1.5">
               <i class="fa-solid ${face.icon} ${face.color}"></i>
-              <span class="w-10 h-1.5 rounded-full bg-white/10 overflow-hidden inline-block"><span class="h-full block bg-emerald-500" style="width:${p.chemistry}%"></span></span>
+              <span class="w-10 h-1.5 rounded-full bg-white/10 overflow-hidden inline-block"><span class="h-full block bg-gradient-to-r from-emerald-600 to-emerald-400" style="width:${p.chemistry}%"></span></span>
             </div>
           </td>
         </tr>`;
@@ -975,7 +1050,7 @@ function selectFormation(f) { state.tactics.formation = f; autoAssignXI(f); rend
 function setTacticsSubTab(tab) { state.tacticsSubTab = tab; renderTacticsScreen(); }
 function renderPitch() {
   const slots = FORMATIONS[state.tactics.formation];
-  document.getElementById("pitchViewH").innerHTML = slots.map((slot, i) => {
+  document.getElementById("pitchTokens").innerHTML = slots.map((slot, i) => {
     const player = findPlayer(state.tactics.xiIds[i]);
     return `
     <button onclick="trySwapIntoSlot(${i})" class="pitch-token absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1" style="left:${slot.x}%; top:${slot.y}%">
@@ -991,7 +1066,7 @@ function renderTacticsSidePanel() {
     const bench = state.players.filter(p => !state.tactics.xiIds.includes(p.id)).sort((a, b) => b.ovr - a.ovr);
     panel.innerHTML = bench.map(p => `
       <button onclick="selectBenchPlayer('${p.id}')" class="w-full flex items-center gap-2.5 p-2.5 rounded-lg mb-1.5 text-left transition ${state.tactics.selectedBenchId === p.id ? "bg-emerald-500/20 ring-1 ring-emerald-400" : "hover:bg-white/5"}">
-        <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-[9px] shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
+        <div class="w-8 h-8 rounded-full chip flex items-center justify-center font-black text-[9px] shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
         <div class="flex-1 min-w-0">
           <p class="text-xs font-semibold truncate">${p.name}</p>
           <p class="text-[10px] text-gray-500">${p.position}</p>
@@ -1051,29 +1126,32 @@ function renderStandings() {
   rows.sort((a, b) => b.points - a.points || b.dg - a.dg || b.gf - a.gf);
   document.getElementById("roundLabel").textContent = `Jornada ${Math.min(state.season.round + 1, state.season.fixtures.length)} / ${state.season.fixtures.length}`;
   document.getElementById("standingsTable").innerHTML = `
-    <thead><tr class="text-gray-500 text-left"><th class="py-1 pr-1">#</th><th class="py-1 pr-1">Club</th><th class="py-1 px-1 text-center">PJ</th><th class="py-1 px-1 text-center">DG</th><th class="py-1 pl-1 text-center">Pts</th></tr></thead>
+    <thead><tr class="text-gray-500 text-left border-b border-white/10"><th class="py-2 pr-1">#</th><th class="py-2 pr-1">Club</th><th class="py-2 px-1 text-center">PJ</th><th class="py-2 px-1 text-center">DG</th><th class="py-2 pl-1 text-center">Pts</th></tr></thead>
     <tbody>
       ${rows.map((r, i) => `
-        <tr class="${r.name === state.club.name ? "bg-emerald-500/10" : ""} border-t border-white/5">
-          <td class="py-1.5 pr-1 text-gray-500">${i + 1}</td>
-          <td class="py-1.5 pr-1 font-semibold truncate max-w-[110px]">${r.name}</td>
-          <td class="py-1.5 px-1 text-center text-gray-400">${r.played}</td>
-          <td class="py-1.5 px-1 text-center text-gray-400">${r.dg > 0 ? "+" : ""}${r.dg}</td>
-          <td class="py-1.5 pl-1 text-center font-black text-emerald-400">${r.points}</td>
+        <tr class="${r.name === state.club.name ? "bg-emerald-500/10" : ""} border-b border-white/5">
+          <td class="py-2 pr-1 text-gray-500 font-display">${i + 1}</td>
+          <td class="py-2 pr-1 font-semibold truncate max-w-[110px]">${r.name}</td>
+          <td class="py-2 px-1 text-center text-gray-400">${r.played}</td>
+          <td class="py-2 px-1 text-center text-gray-400">${r.dg > 0 ? "+" : ""}${r.dg}</td>
+          <td class="py-2 pl-1 text-center font-display font-bold text-emerald-400">${r.points}</td>
         </tr>
       `).join("")}
     </tbody>`;
 }
 function renderFixtures() {
   if (!state.season) return;
+  const nextFixture = state.season.userFixtures.find(x => !x.played);
   document.getElementById("fixtureList").innerHTML = state.season.userFixtures.map(f => {
+    const isNext = f === nextFixture;
     const right = f.played
-      ? `<span class="font-black text-sm ${f.gf > f.ga ? "text-emerald-400" : f.gf === f.ga ? "text-gray-400" : "text-red-400"}">${f.gf} - ${f.ga}</span>`
-      : `<span class="text-[10px] text-gray-500 font-semibold">Pendiente</span>`;
+      ? `<span class="font-display font-bold text-lg ${f.gf > f.ga ? "text-emerald-400" : f.gf === f.ga ? "text-gray-400" : "text-red-400"}">${f.gf} - ${f.ga}</span>`
+      : `<span class="text-[10px] text-gray-500 font-semibold uppercase">Pendiente</span>`;
     return `
-    <div class="card-sm p-3 flex items-center justify-between gap-2">
-      <div class="min-w-0">
-        <p class="text-[10px] text-gray-500 font-bold">Jornada ${f.round + 1} · ${f.home ? "Local" : "Visitante"} · ${fmtDate(addDays(state.season.startDate, f.round * 7))}</p>
+    <div class="card-sm p-3 flex items-center gap-3 ${isNext ? "ring-1 ring-emerald-400/40" : ""}">
+      <div class="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center text-[10px] font-display font-bold text-gray-400 shrink-0">${f.round + 1}</div>
+      <div class="min-w-0 flex-1">
+        <p class="text-[10px] text-gray-500 font-bold">${f.home ? "Local" : "Visitante"} · ${fmtDate(addDays(state.season.startDate, f.round * 7))}</p>
         <p class="text-sm font-semibold truncate">${f.opponent}</p>
       </div>
       ${right}
@@ -1119,14 +1197,14 @@ function buyPlayer(mid) {
 function renderMarket() {
   document.getElementById("marketList").innerHTML = state.market.map(p => `
     <div class="card-sm p-3 flex items-center gap-3">
-      <div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
+      <div class="w-10 h-10 rounded-full chip flex items-center justify-center font-black text-xs shrink-0" style="background:${avatarColor(p.name)}">${initials(p.name)}</div>
       <div class="flex-1 min-w-0">
         <p class="font-bold text-xs truncate">${p.name}</p>
         <p class="text-[10px] text-gray-500 font-semibold">${p.position} · ${p.age} años</p>
         <p class="text-[10px] text-emerald-400 font-bold mt-0.5">${fmtMoney(p.price)}</p>
       </div>
-      <span class="text-[11px] font-black px-1.5 py-0.5 rounded ${ovrBadgeClass(p.ovr)}">${p.ovr}</span>
-      <button onclick="buyPlayer('${p.mid}')" class="text-[11px] font-bold bg-emerald-500 hover:bg-emerald-400 text-black px-3 py-2 rounded-lg shrink-0">Fichar</button>
+      <span class="text-[11px] px-1.5 py-0.5 rounded ${ovrBadgeClass(p.ovr)}">${p.ovr}</span>
+      <button onclick="buyPlayer('${p.mid}')" class="btn-primary text-[11px] font-bold px-3 py-2 rounded-lg shrink-0 transition">Fichar</button>
     </div>
   `).join("");
 }
@@ -1208,7 +1286,7 @@ function openPlayerModal(id) {
   document.getElementById("modalPrimaryPos").textContent = p.position;
   document.getElementById("modalOtherPos").textContent = p.positions.slice(1).join(" ");
   const ovrEl = document.getElementById("modalOvr");
-  ovrEl.textContent = p.ovr; ovrEl.className = "text-2xl font-black mt-0.5 " + statColor(p.ovr);
+  ovrEl.textContent = p.ovr; ovrEl.className = "font-display text-2xl font-bold mt-0.5 " + statColor(p.ovr);
   document.getElementById("modalHealth").textContent = p.health + "%";
   const face = moraleFace(p.chemistry);
   document.getElementById("modalMorale").innerHTML = `<i class="fa-solid ${face.icon} ${face.color}"></i>`;
@@ -1219,7 +1297,7 @@ function openPlayerModal(id) {
   const stats = computeSubStats(p);
   const labels = { ritmo: "RIT", tiro: "TIR", pase: "PAS", regate: "REG", defensa: "DEF", fisico: "FÍS" };
   document.getElementById("modalStats").innerHTML = Object.entries(stats).map(([k, v]) => `
-    <div><p class="text-[11px] text-gray-500 font-semibold">${labels[k]}</p><p class="text-xl font-black mt-0.5 ${statColor(v)}">${v}</p></div>
+    <div><p class="text-[11px] text-gray-500 font-semibold">${labels[k]}</p><p class="font-display text-xl font-bold mt-0.5 ${statColor(v)}">${v}</p></div>
   `).join("");
 
   const select = document.getElementById("modalPositionSelect");
